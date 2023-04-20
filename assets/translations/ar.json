@@ -1,0 +1,13 @@
+{
+  "emailfieldcantbeempty": "لا يمكن أن يكون البريد الإلكتروني فارغًا",
+  "pleaseenteravalidemail": "يرجى إدخال بريد الإلكتروني صحيح",
+  "email": "بريد إلكتروني",
+  "enteryouremail": "أدخل بريدك الإلكتروني",
+  "passwordfieldcantbeempty": "لا يمكن أن تكون كلمة السرفارغة",
+  "passwordmustbeatleast6characters": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+  "password": "كلمة السر",
+  "enteryourpassword": "ادخل كلمة السر",
+  "nicknamecantbeempty": "لا يمكن أن يكون الاسم المستعار فارغًا",
+  "nickname": "اسم مستعار",
+  "enteryournickname": "أدخل اسمك المستعار"
+}

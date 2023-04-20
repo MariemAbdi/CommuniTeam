@@ -1,0 +1,13 @@
+{
+  "emailfieldcantbeempty": "Email Field Can't Be Empty",
+  "pleaseenteravalidemail": "Please Enter A Valid Email",
+  "email": "Email",
+  "enteryouremail": "Enter Your Email",
+  "passwordfieldcantbeempty": "Password Field Can't Be Empty",
+  "passwordmustbeatleast6characters": "Password Must Be At Least 6 Characters",
+  "password": "Password",
+  "enteryourpassword": "Enter Your Password",
+  "nicknamecantbeempty": "Username Field Can't Be Empty",
+  "nickname": "Username",
+  "enteryournickname": "Enter Your Username"
+}

@@ -1,0 +1,13 @@
+{
+  "emailfieldcantbeempty": "E-mail Ne Peut Pas Être Vide",
+  "pleaseenteravalidemail": "Veuillez Saisir Un E-mail Valide",
+  "email": "E-mail",
+  "enteryouremail": "Entrer Votre E-mail",
+  "passwordfieldcantbeempty": "Mot De Passe Ne Peut Pas Être Vide",
+  "passwordmustbeatleast6characters": "Le Mot De Passe Doit Être Au Moins De 6 Caractères",
+  "password": "Mot De Passe",
+  "enteryourpassword": "Entrer Votre Mot De Passe",
+  "nicknamecantbeempty": "Le Surnom Ne Peut Pas Être Vide",
+  "nickname": "Surnom",
+  "enteryournickname": "Entrer Votre Surnom"
+}

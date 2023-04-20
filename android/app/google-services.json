@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "5435122554",
+    "project_id": "communiteam-fd07b",
+    "storage_bucket": "communiteam-fd07b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5435122554:android:ae49f9dda7addd3fc16cc3",
+        "android_client_info": {
+          "package_name": "com.example.communiteam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5435122554-ksp9tldpe4402c14tosc3ufnjm32qjvc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkiHgt4fmfP7JgI1Z2nuvvXK1I2nzvnBE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5435122554-ksp9tldpe4402c14tosc3ufnjm32qjvc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
