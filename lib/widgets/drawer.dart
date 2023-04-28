@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/resources/firestore_methods.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/widgets/drawer_item.dart';
@@ -26,7 +27,40 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   bool publicCanals=false;
   bool privateCanals=false;
-  bool directMessages=false;
+  bool directMessages=true;
+
+
+  List<dynamic> allUsers =[];
+
+  getUsers() async {
+    await FirebaseFirestore.instance
+        .collection("teams")
+        .doc("toBCHluEdzfmeoXhCxQw")
+        .get()
+        .then((value) async {
+      // get users Ids
+      List<String> followersIds = List.from(value.data()!["members"]);
+
+      // loop through all ids and get associated user object by userID/followerID
+      for (int i = 0; i < followersIds.length; i++) {
+        var userId = followersIds[i];
+        var data = await FirebaseFirestore.instance
+            .collection("users")
+            .doc(userId)
+            .get();
+
+        allUsers.add(data);
+      }
+      setState(() {
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +95,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     //SOME SPACE
                     const SizedBox(height: 10,),
 
-                    //---------------------------PUBLIC CHANNELS---------------------------------------
+                    //---------------------------TEAMS---------------------------------------
 
                     //TEAM DROPDOWN
                     teamWidget(),
@@ -126,12 +160,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       visible: directMessages,
                       child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
                         child: ListView.builder(
-                            itemCount: 3,
+                            itemCount: allUsers.length,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             physics: const ClampingScrollPhysics(),
                             itemBuilder: (BuildContext context, int index){
-                              return const DrawerItem(name: "name");
+                              return DrawerItem(name: allUsers[index]["nickname"]);
                             }),),
                     ),
 

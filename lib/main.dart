@@ -7,7 +7,6 @@ import 'package:communiteam/screens/profile.dart';
 import 'package:communiteam/screens/settings.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/services/Theme/theme_service.dart';
-import 'package:communiteam/widgets/profile_picture.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,33 +43,36 @@ Future<void> main() async{
       child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-    Provider<FirebaseAuthMethods>(
-    create: (_)=>FirebaseAuthMethods(FirebaseAuth.instance),
-    ),
+    Provider<FirebaseAuthMethods>(create: (_)=>FirebaseAuthMethods(FirebaseAuth.instance),),
+
     StreamProvider(
-    create: (context)=>context.read<FirebaseAuthMethods>().authState,
-    initialData: null)
+    create: (context)=>context.read<FirebaseAuthMethods>().authState, initialData: null),
+
     ],
-    child:GetMaterialApp(
+    child: GetMaterialApp(
       debugShowCheckedModeBanner: false,
       //APP THEME CONFIGURATION
       theme: CustomTheme.lightTheme,
       darkTheme: CustomTheme.darkTheme,
-      themeMode: ThemeService().theme,
+      themeMode: ThemeMode.system,//ThemeService().theme,
       //LOCALIZATION CONFIGURATION
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       //FIRST SCREEN
-      //home: const SplashScreen(),
       home: const Auth(),
       routes: {
         LoginScreen.routeName: (context) => const LoginScreen(),
@@ -79,7 +81,8 @@ class MyApp extends StatelessWidget {
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         ProfileScreen.routeName: (context) => const ProfileScreen(),
       },
-    ));
+    )
+    );
   }
 }
 

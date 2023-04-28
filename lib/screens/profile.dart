@@ -39,49 +39,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 ProfilePicture(userId: user.email!,),
 
-
-                //HORIZONTAL LINE
-                const Divider(),
-
-                //LOGOUT BUTTON
-                CustomButton(text: LocaleKeys.logout.tr(), function: (){
-                  AlertDialog(
-                    actionsAlignment: MainAxisAlignment.start,
-                    title: Text(
-                      LocaleKeys.logout.tr(),
-                      style:
-                      GoogleFonts.robotoCondensed(),
-                    ),
-                    content: const Text("Would you like to logout?"),
-                    actions: [
-                      TextButton(
-                        child: Text(
-                          LocaleKeys.add.tr(),
-                          style: GoogleFonts
-                              .robotoCondensed(),
-                        ),
-                        onPressed: () {
-                          FirebaseAuth.instance.signOut();
-                        },
-                      ),
-                      TextButton(
-                        child: Text(
-                          LocaleKeys.cancel.tr(),
-                          style:
-                          GoogleFonts.robotoCondensed(
-                              color:
-                              Colors.red),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pop();
-                        },
-                      ),
-                    ],
-                  );
-                }),
-
-                
               ],
             ),
           ),
