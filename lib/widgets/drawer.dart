@@ -23,28 +23,52 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   final user = FirebaseAuth.instance.currentUser!;
   List<String> teams=[];
+  List<String> teamsIDS=[];
+  List<String> publicCanalsList=[];
+  List<String> privateCanalsList=[];
+  List<dynamic> allUsers =[];
 
-  String dropdownValue = "Group2";
+  String dropdownValue = "ISET RADES";
 
   bool publicCanals=false;
   bool privateCanals=false;
-  bool directMessages=true;
+  bool directMessages=false;
 
 
-  List<dynamic> allUsers =[];
+  //GET THE TEAMS NAMES
+  getTeams() async {
+    await FirebaseFirestore.instance
+        .collection("teams").snapshots().forEach((element) {
+          List<String> namesList=[];
+          List<String> idsList=[];
+      for (var value in element.docs) {
+          namesList.add(value['name']);
+          idsList.add(value['id']);
+      }
+      setState(() {
+        teams=namesList;
+        teams.add("Create Team+");
 
-  getUsers() async {
+        teamsIDS=idsList;
+
+      });
+    });
+  }
+
+  //GET ALL THE USERS IN A SPECIFIC TEAM
+  getUsers(String id) async {
     await FirebaseFirestore.instance
         .collection("teams")
-        .doc("toBCHluEdzfmeoXhCxQw")
+        .doc(id)
         .get()
         .then((value) async {
-      // get users Ids
-      List<String> followersIds = List.from(value.data()!["members"]);
+
+          // get users Ids
+      List<String> members = List.from(value.data()!["members"]);
 
       // loop through all ids and get associated user object by userID/followerID
-      for (int i = 0; i < followersIds.length; i++) {
-        var userId = followersIds[i];
+      for (int i = 0; i < members.length; i++) {
+        var userId = members[i];
         var data = await FirebaseFirestore.instance
             .collection("users")
             .doc(userId)
@@ -56,11 +80,34 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
     });
   }
+  
+  //GET THE CANALS
+  getCanals(String id) async {
+      await FirebaseFirestore.instance
+          .collection("teams")
+          .doc(id).collection("channels").snapshots().forEach((element) {
+            List<String> public=[];
+            List<String> private=[];
+            for (var value in element.docs) {
+              if(value['private']){
+                private.add(value['name']);
+              }else{
+                public.add(value['name']);
+              }
+            }
+            setState(() {
+              privateCanalsList=private;
+              publicCanalsList=public;
+            });
+      });
+  }
 
   @override
   void initState() {
     super.initState();
-    getUsers();
+    getTeams();
+    getUsers("toBCHluEdzfmeoXhCxQw");
+    getCanals("toBCHluEdzfmeoXhCxQw");
   }
 
   @override
@@ -112,12 +159,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       visible: publicCanals,
                       child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
                       child: ListView.builder(
-                          itemCount: 3,
+                          itemCount: publicCanalsList.length,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (BuildContext context, int index){
-                            return const DrawerItemCanal(name: "name");
+
+                            return DrawerItemCanal(name: publicCanalsList[index]);
+
                           }),
                       ),
                     ),
@@ -137,12 +186,14 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height*0.2,
                         child: ListView.builder(
-                            itemCount: 2,
+                            itemCount: privateCanalsList.length,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             physics: const ClampingScrollPhysics(),
                             itemBuilder: (BuildContext context, int index){
-                              return const DrawerItemCanal(name: "name");
+
+                              return DrawerItemCanal(name: privateCanalsList[index]);
+
                             }),
                       ),
                     ),
@@ -299,7 +350,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         dropdownColor: Colors.grey,
         borderRadius: BorderRadius.circular(12),
         underline: Container(),
-        items: <String>['Group1', 'Group2', 'Group3','Add New Team +']
+        items: teams
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
