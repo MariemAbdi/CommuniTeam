@@ -2,11 +2,11 @@
 
 import 'package:communiteam/screens/sign_up.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
-import 'package:communiteam/utils.dart';
+
 import 'package:communiteam/widgets/custom_button.dart';
 import 'package:communiteam/widgets/email_field.dart';
 import 'package:communiteam/widgets/password_field.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';

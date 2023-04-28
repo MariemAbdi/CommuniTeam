@@ -1,3 +1,4 @@
+import 'package:communiteam/widgets/adding_appbar.dart';
 import 'package:communiteam/widgets/chat_item.dart';
 import 'package:communiteam/widgets/custom_appbar.dart';
 import 'package:communiteam/widgets/drawer.dart';
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        appBar: const CustomAppbar(title: "Channel Name",),
+        appBar: const AddingAppbar(title: "Channel Name",),
         drawer: const DrawerWidget(),
         body: Container(),
       ),
