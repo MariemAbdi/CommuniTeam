@@ -1,22 +1,24 @@
+import 'package:communiteam/screens/direct_chat.dart';
 import 'package:communiteam/screens/homepage.dart';
 import 'package:flutter/material.dart';
 
 
-class DrawerItem extends StatefulWidget {
+class DrawerItemDirect extends StatefulWidget {
   final String name;
-  const DrawerItem({Key? key, required this.name}) : super(key: key);
+  final String receiverId;
+  const DrawerItemDirect({Key? key, required this.name,required this.receiverId}) : super(key: key);
 
   @override
-  State<DrawerItem> createState() => _DrawerItemState();
+  State<DrawerItemDirect> createState() => _DrawerItemDirectState();
 }
 
-class _DrawerItemState extends State<DrawerItem> {
+class _DrawerItemDirectState extends State<DrawerItemDirect> {
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: (){
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const HomePage()));
+          builder: (context) => DirectChatScreen(receiverId: widget.receiverId)));
     },
       child: Align(
           alignment: Alignment.centerLeft,

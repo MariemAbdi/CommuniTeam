@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/resources/firestore_methods.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
-import 'package:communiteam/widgets/drawer_item.dart';
+import 'package:communiteam/widgets/drawer_item_canal.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/firebase_auth_methods.dart';
 import '../translations/locale_keys.g.dart';
+import 'drawer_item_direct.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -116,7 +117,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           shrinkWrap: true,
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (BuildContext context, int index){
-                            return const DrawerItem(name: "name");
+                            return const DrawerItemCanal(name: "name");
                           }),
                       ),
                     ),
@@ -141,7 +142,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             shrinkWrap: true,
                             physics: const ClampingScrollPhysics(),
                             itemBuilder: (BuildContext context, int index){
-                              return const DrawerItem(name: "name");
+                              return const DrawerItemCanal(name: "name");
                             }),
                       ),
                     ),
@@ -165,7 +166,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             shrinkWrap: true,
                             physics: const ClampingScrollPhysics(),
                             itemBuilder: (BuildContext context, int index){
-                              return DrawerItem(name: allUsers[index]["nickname"]);
+                              return DrawerItemDirect(name: allUsers[index]["nickname"], receiverId: allUsers[index]["email"]);
                             }),),
                     ),
 
