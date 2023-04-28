@@ -47,100 +47,106 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: purple,
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.8),
-                          spreadRadius: 3,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Theme(
+          data: CustomTheme.lightTheme,
+          child: Scaffold(
+            backgroundColor: purple,
+            body: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.8),
+                              spreadRadius: 3,
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          // Image
-                          Image.asset(
-                            'assets/images/logo.png',
-                            width: MediaQuery.of(context).size.width*0.3,
-                          ),
-                          //Title
-                          FittedBox(
-                            child: Text('WELCOME BACK!', style: GoogleFonts.robotoCondensed(fontSize: 40, fontWeight: FontWeight.w800, color: purple),
-                            ),
-                          ),
-                          SizedBox(height: 20),
-
-                          //EMAIL FIELD
-                          EmailField(emailController: _emailController),
-
-                          //SOME SPACE
-                          SizedBox(height: 15),
-
-                          //PASSWORD FIELD
-                          PasswordField(passwordController: _passwordController),
-
-                          //SOME SPACE
-                          SizedBox(height: 20),
-
-                          //SIGN IN BUTTON
-                          CustomButton(text: "SIGN IN", function: (){
-                            if (_formKey.currentState?.validate() ?? false) {
-                              signIn();
-                            }
-                          }),
-
-                          //SOME SPACE
-                          SizedBox(height: 20),
-
-                          FittedBox(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Not A Member Yet? ',
-                                  style: GoogleFonts.robotoCondensed(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              // Image
+                              Image.asset(
+                                'assets/images/logo.png',
+                                width: MediaQuery.of(context).size.width*0.3,
+                              ),
+                              //Title
+                              FittedBox(
+                                child: Text('WELCOME BACK!', style: GoogleFonts.robotoCondensed(fontSize: 40, fontWeight: FontWeight.w800, color: purple),
                                 ),
-                                InkWell(
-                                  onTap: goToSignupScreen,
-                                  child: Text(
-                                    'Sign Up Now',
-                                    style: GoogleFonts.robotoCondensed(
+                              ),
+                              SizedBox(height: 20),
+
+                              //EMAIL FIELD
+                              EmailField(emailController: _emailController),
+
+                              //SOME SPACE
+                              SizedBox(height: 15),
+
+                              //PASSWORD FIELD
+                              PasswordField(passwordController: _passwordController),
+
+                              //SOME SPACE
+                              SizedBox(height: 20),
+
+                              //SIGN IN BUTTON
+                              CustomButton(text: "SIGN IN", function: (){
+                                if (_formKey.currentState?.validate() ?? false) {
+                                  signIn();
+                                }
+                              }),
+
+                              //SOME SPACE
+                              SizedBox(height: 20),
+
+                              FittedBox(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Not A Member Yet? ',
+                                      style: GoogleFonts.robotoCondensed(
                                         fontSize: 16,
-                                        color: CustomTheme.green,
-                                        fontWeight: FontWeight.w800,
-                                        decoration: TextDecoration.underline
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
+                                    InkWell(
+                                      onTap: goToSignupScreen,
+                                      child: Text(
+                                        'Sign Up Now',
+                                        style: GoogleFonts.robotoCondensed(
+                                            fontSize: 16,
+                                            color: CustomTheme.green,
+                                            fontWeight: FontWeight.w800,
+                                            decoration: TextDecoration.underline
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          )
-                        ],
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

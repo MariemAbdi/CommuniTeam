@@ -9,5 +9,19 @@
   "enteryourpassword": "Enter Your Password",
   "nicknamecantbeempty": "Username Field Can't Be Empty",
   "nickname": "Username",
-  "enteryournickname": "Enter Your Username"
+  "enteryournickname": "Enter Your Username",
+  "team": "Team",
+  "logout": "LOGOUT",
+  "settings": "Settings",
+  "myProfile": "My Profile",
+  "publicCanals": "Public Canals",
+  "privateCanals": "Private Canals",
+  "directMessages": "Direct Messages",
+  "darkMode": "Dark Mode",
+  "language": "Language",
+  "createNewCanal": "Create A New Canal",
+  "canalName": "Canal Name",
+  "add": "Add",
+  "cancel": "Cancel",
+  "yes": "Yes"
 }

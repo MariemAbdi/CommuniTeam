@@ -8,6 +8,8 @@ class CustomTheme{
   static const  green= Color(0xFF2eb67d);
   static const  blue= Color(0xFF36c5f0);
   static const  pink= Color(0xFFe01e5a);
+  static const  white= Color(0xFFffffff);
+  static const  black= Color(0xFF000000);
 
 
   static final lightTheme = ThemeData.light().copyWith(
@@ -20,7 +22,6 @@ class CustomTheme{
       toolbarHeight: 50,
       color: darkPurple
     ),
-
 
     dividerTheme: const DividerThemeData(
       thickness: 1.0,
@@ -61,7 +62,7 @@ class CustomTheme{
     ),
 
     drawerTheme: const DrawerThemeData(
-      elevation: 2.0,
+      elevation: 6.0,
     ),
 
     inputDecorationTheme: InputDecorationTheme(

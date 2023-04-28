@@ -1,9 +1,13 @@
 import 'package:animate_icons/animate_icons.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
 import 'package:communiteam/widgets/custom_appbar.dart';
+import 'package:communiteam/widgets/drawer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Trans;
+import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../services/Theme/theme_service.dart';
 
@@ -16,13 +20,26 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+
   AnimateIconController controller = AnimateIconController();
   String dropdownValue="English";
+  final language=GetStorage();
 
+  @override
+  void initState() {
+    super.initState();
+    if(language.read("language")!=null) {
+      setState(() {
+        dropdownValue = language.read("language");
+      });
+    }
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppbar(title: "Settings",),
+      appBar: CustomAppbar(title: LocaleKeys.settings.tr(),),
+      drawer: const DrawerWidget(),
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
@@ -55,7 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
-          const Text("Theme Mode", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+          Text(LocaleKeys.darkMode.tr(), style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),),
 
           //CHANGE THE APP'S THEME ICON
           AnimateIcons(
@@ -63,9 +80,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             endIcon: EvaIcons.sun,
             size: 30.0,
             controller: controller,
-            // add this tooltip for the start icon
+            //the start icon
             startTooltip: 'Icons.add_circle',
-            // add this tooltip for the end icon
+            //the end icon
             endTooltip: 'Icons.add_circle_outline',
             onStartIconPress: () {
               ThemeService().switchTheme();
@@ -100,7 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
-        const Text("Language", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
+         Text(LocaleKeys.language.tr(), style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),),
 
         DropdownButton<String>(
         value: dropdownValue,
@@ -113,30 +130,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: value,
                 child: Text(
                   value,
-                  //style: GoogleFonts.ptSans(),
+                  style: GoogleFonts.robotoCondensed(),
                 ),
               );
             }).toList(),
             onChanged: (String? newValue) async {
               setState(() {
                 dropdownValue = newValue!;
-                //language.write("language", newValue);
+                language.write("language", newValue);
               });
 
               if (dropdownValue.compareTo("English") == 0) {
                 await context.setLocale(const Locale('en')); // change `easy_localization` locale
                 await Get.updateLocale(const Locale('en')); // change `Get` locale direction
 
+                //REFRESH SCREEN
                 setState((){});
               } else if (dropdownValue.compareTo("Français") == 0) {
                 await context.setLocale(const Locale('fr')); // change `easy_localization` locale
                 await Get.updateLocale(const Locale('fr')); // change `Get` locale direction
 
+                //REFRESH SCREEN
                 setState((){});
               } else {
                 await context.setLocale(const Locale('ar')); // change `easy_localization` locale
                 await Get.updateLocale(const Locale('ar')); // change `Get` locale direction
 
+                //REFRESH SCREEN
                 setState((){});
               }
             })

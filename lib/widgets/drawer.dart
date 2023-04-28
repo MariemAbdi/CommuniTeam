@@ -1,8 +1,14 @@
-import 'package:communiteam/screens/settings.dart';
+import 'package:communiteam/resources/firestore_methods.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/widgets/drawer_item.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/firebase_auth_methods.dart';
+import '../translations/locale_keys.g.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
@@ -14,12 +20,13 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
 
   final user = FirebaseAuth.instance.currentUser!;
+  List<String> teams=[];
 
   String dropdownValue = "Group2";
 
-  bool publicChannels=true;
-  bool privateChannels=true;
-  bool directMessages=true;
+  bool publicCanals=false;
+  bool privateCanals=false;
+  bool directMessages=false;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +36,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraint.maxHeight),
+              constraints: BoxConstraints(minHeight: constraint.maxHeight * 0.95),
               child: IntrinsicHeight(
                 child: Column(
                   children: <Widget>[
@@ -49,23 +56,25 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     const SizedBox(height: 10,),
 
                     //THE USER'S USERNAME
-                    Text(user.displayName!,style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white, overflow: TextOverflow.ellipsis),),
+                    Text(user.displayName!,style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white, overflow: TextOverflow.ellipsis),)),
 
                     //SOME SPACE
                     const SizedBox(height: 10,),
 
-                    //TEAM GROUP SELECTION
+                    //---------------------------PUBLIC CHANNELS---------------------------------------
+
+                    //TEAM DROPDOWN
                     teamWidget(),
 
                     //---------------------------PUBLIC CHANNELS---------------------------------------
-                    channelAddition("Public Channels",publicChannels, (){
+                    channelAddition(LocaleKeys.publicCanals.tr(),publicCanals, (){
                       setState(() {
-                        publicChannels=!publicChannels;
+                        publicCanals=!publicCanals;
                       });
-                    },(){}),
+                    },false),
 
                     Visibility(
-                      visible: publicChannels,
+                      visible: publicCanals,
                       child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
                       child: ListView.builder(
                           itemCount: 3,
@@ -74,21 +83,22 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (BuildContext context, int index){
                             return const DrawerItem(name: "name");
-                          }),),
+                          }),
+                      ),
                     ),
 
                     //HORIZONTAL LINE
                     const Divider(),
 
                     //---------------------------PRIVATE CHANNELS---------------------------------------
-                    channelAddition("Private Channels", privateChannels,(){
+                    channelAddition(LocaleKeys.privateCanals.tr(), privateCanals,(){
                     setState(() {
-                    privateChannels=!privateChannels;
+                    privateCanals=!privateCanals;
                     });
-                    },(){}),
+                    },true),
 
                     Visibility(
-                      visible: privateChannels,
+                      visible: privateCanals,
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height*0.2,
                         child: ListView.builder(
@@ -106,11 +116,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     const Divider(),
 
                     //---------------------------DIRECT MESSAGES---------------------------------------
-                    channelAddition("Direct Messages",directMessages,() {
+                    channelAddition(LocaleKeys.directMessages.tr(),directMessages,() {
                     setState(() {
                     directMessages=!directMessages;
                     });
-                    },(){}),
+                    },true),
 
                     Visibility(
                       visible: directMessages,
@@ -125,8 +135,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             }),),
                     ),
 
-
-
                     //SOME SPACE
                     const Expanded(child: SizedBox()),
 
@@ -137,23 +145,69 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   children: [
                                     //HORIZONTAL LINE
                                     const Divider(),
-                                    
+
                                     //GO TO PROFILE
-                                    bottomListTile("Profile", Icons.account_circle, () { }),
+                                    bottomListTile(LocaleKeys.myProfile.tr(), Icons.account_circle, () {
+                                      Navigator.pop(context);
+                                      Navigator.of(context).pushReplacementNamed('/profile');
+
+                                      // Navigator.of(context).push(MaterialPageRoute(
+                                      //     builder: (context) => const ProfileScreen()));
+                                    }),
 
                                     //GO TO SETTINGS
-                                    bottomListTile("Settings", Icons.settings, () {
-                                      Navigator.of(context).push(MaterialPageRoute(
-                                          builder: (context) => const SettingsScreen()));
+                                    bottomListTile(LocaleKeys.settings.tr(), Icons.settings, () {
+                                      // Navigator.pop(context);
+                                      // Navigator.of(context).push(MaterialPageRoute(
+                                      //     builder: (context) => const SettingsScreen()));
+                                      Navigator.pop(context);
+                                      Navigator.of(context).pushReplacementNamed('/settings');
                                     }),
 
-                                    //HORIZONTAL LINE
                                     const Divider(),
 
-                                    //LOGOUT BUTTON
-                                    bottomListTile("LOGOUT", Icons.power_settings_new, () {
-                                      FirebaseAuth.instance.signOut();
-                                    }),
+                      bottomListTile(LocaleKeys.logout.tr(), Icons.power_settings_new, () {
+                        showCupertinoModalPopup(context: context, builder: (BuildContext context){
+                          return AlertDialog(
+                            actionsAlignment: MainAxisAlignment.start,
+                            title: Text(
+                              LocaleKeys.logout.tr(),
+                              style:
+                              GoogleFonts.robotoCondensed(),
+                            ),
+                            content: const Text("Would you like to logout?"),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  LocaleKeys.yes.tr(),
+                                  style: GoogleFonts
+                                      .robotoCondensed(),
+                                ),
+                                onPressed: () {
+                                  // FirebaseAuth.instance.signOut();
+                                  context.read<FirebaseAuthMethods>().signOut(context);
+                                },
+                              ),
+                              TextButton(
+                                child: Text(
+                                  LocaleKeys.cancel.tr(),
+                                  style:
+                                  GoogleFonts.robotoCondensed(
+                                      color:
+                                      Colors.red),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop();
+                                },
+                              ),
+                            ],
+                          );
+
+                        });
+                      }),
+
+
                                   ],
                                 ),),
 
@@ -169,25 +223,30 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   //CHANNEL NAME AND FUNCTION
-  Widget channelAddition(String name,bool visibility, VoidCallback showHide,VoidCallback add){
+  Widget channelAddition(String name,bool visibility, VoidCallback showHide,bool isPrivate){
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         InkWell(
           onTap: showHide,
           child: Row(children: [
-            Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, overflow: TextOverflow.ellipsis, color: Colors.white),),
+            Text(name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, overflow: TextOverflow.ellipsis, color: Colors.white)),),
             Icon(visibility?Icons.keyboard_arrow_up:Icons.keyboard_arrow_down, color: Colors.white,),
           ],),
         ),
-        IconButton(onPressed: add, icon: const Icon(Icons.add_circle, color: Colors.white))
+        IconButton(onPressed: (){
+          showCupertinoModalPopup(context: context, builder: (BuildContext context){
+            return createCanal(isPrivate);
+          });
+
+        }, icon: const Icon(Icons.add_circle, color: Colors.white))
       ],);
   }
 
   //CUSTOM LIST TILE
   Widget bottomListTile(String name, IconData iconData, VoidCallback function){
     return ListTile(
-      title: Text(name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, overflow: TextOverflow.ellipsis, color: Colors.white),),
+      title: Text(name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, overflow: TextOverflow.ellipsis, color: Colors.white),)),
       leading: Icon(iconData, color: Colors.white),
       contentPadding: const EdgeInsets.all(0),
       minLeadingWidth: 5,
@@ -199,18 +258,19 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   Widget teamWidget(){
     return DropdownButton<String>(
         value: dropdownValue,
-        style: const TextStyle(color: Colors.white,fontWeight: FontWeight.w700, fontSize: 20, overflow: TextOverflow.ellipsis),
+        style: const TextStyle(color: Colors.white,fontWeight: FontWeight.w700, fontSize: 19, overflow: TextOverflow.ellipsis),
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
         dropdownColor: Colors.grey,
         borderRadius: BorderRadius.circular(12),
         underline: Container(),
-        items: <String>['Group1', 'Group2', 'Group3']
+        items: <String>['Group1', 'Group2', 'Group3','Add New Team +']
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(
               value,
+              style: GoogleFonts.robotoCondensed(),
             ),
           );
         }).toList(),
@@ -220,5 +280,59 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           });
 
         });
+  }
+
+  //CANAL CREATION
+  createCanal(bool isPrivate){
+    String channelName="";
+    return AlertDialog(
+      actionsAlignment:
+      MainAxisAlignment.start,
+      title: Text(
+        LocaleKeys.createNewCanal.tr(),
+        style:
+        GoogleFonts.robotoCondensed(),
+      ),
+      content: TextFormField(
+        decoration: InputDecoration(
+          hintText: LocaleKeys.canalName.tr()
+        ),
+        onChanged: (name) {
+          channelName = name;
+        },
+      ),
+      actions: [
+        TextButton(
+          child: Text(
+            LocaleKeys.add.tr(),
+            style: GoogleFonts
+                .robotoCondensed(),
+          ),
+          onPressed: () {
+            if(channelName.isNotEmpty){
+              FirestoreMethods firestoreMethods= FirestoreMethods();
+              firestoreMethods.addCanal("toBCHluEdzfmeoXhCxQw", channelName, isPrivate,user.email!);
+
+              //customSnackBar(context, "Canal Created Successfully!", Colors.green);
+            }
+            Navigator.of(context)
+                .pop();
+          },
+        ),
+        TextButton(
+          child: Text(
+            LocaleKeys.cancel.tr(),
+            style:
+            GoogleFonts.robotoCondensed(
+                color:
+                Colors.red),
+          ),
+          onPressed: () {
+            Navigator.of(context)
+                .pop();
+          },
+        ),
+      ],
+    );
   }
 }

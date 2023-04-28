@@ -3,9 +3,11 @@ import 'package:communiteam/firebase_options.dart';
 import 'package:communiteam/providers/firebase_auth_methods.dart';
 import 'package:communiteam/screens/auth.dart';
 import 'package:communiteam/screens/homepage.dart';
+import 'package:communiteam/screens/profile.dart';
 import 'package:communiteam/screens/settings.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/services/Theme/theme_service.dart';
+import 'package:communiteam/widgets/profile_picture.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -75,6 +77,7 @@ class MyApp extends StatelessWidget {
         SignupScreen.routeName: (context) => const SignupScreen(),
         HomePage.routeName: (context) => const HomePage(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
+        ProfileScreen.routeName: (context) => const ProfileScreen(),
       },
     ));
   }

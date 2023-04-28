@@ -25,7 +25,21 @@ class CodegenLoader extends AssetLoader{
   "enteryourpassword": "ادخل كلمة السر",
   "nicknamecantbeempty": "لا يمكن أن يكون الاسم المستعار فارغًا",
   "nickname": "اسم مستعار",
-  "enteryournickname": "أدخل اسمك المستعار"
+  "enteryournickname": "أدخل اسمك المستعار",
+  "team": "فريق",
+  "logout": "تسجيل الخروج",
+  "settings": "إعدادات",
+  "myProfile": "ملفي",
+  "publicCanals": "القنوات العامة",
+  "privateCanals": "القنوات الخاصة",
+  "directMessages": "رسائل مباشرة",
+  "darkMode": "الوضع الداكن",
+  "language": "اللغة",
+  "createNewCanal": "إنشاء قناة جديدة",
+  "canalName": "إسم القناة",
+  "add": "إضافة",
+  "cancel": "إلغاء",
+  "yes": "نعم"
 };
 static const Map<String,dynamic> en = {
   "emailfieldcantbeempty": "Email Field Can't Be Empty",
@@ -38,7 +52,21 @@ static const Map<String,dynamic> en = {
   "enteryourpassword": "Enter Your Password",
   "nicknamecantbeempty": "Username Field Can't Be Empty",
   "nickname": "Username",
-  "enteryournickname": "Enter Your Username"
+  "enteryournickname": "Enter Your Username",
+  "team": "Team",
+  "logout": "LOGOUT",
+  "settings": "Settings",
+  "myProfile": "My Profile",
+  "publicCanals": "Public Canals",
+  "privateCanals": "Private Canals",
+  "directMessages": "Direct Messages",
+  "darkMode": "Dark Mode",
+  "language": "Language",
+  "createNewCanal": "Create A New Canal",
+  "canalName": "Canal Name",
+  "add": "Add",
+  "cancel": "Cancel",
+  "yes": "Yes"
 };
 static const Map<String,dynamic> fr = {
   "emailfieldcantbeempty": "E-mail Ne Peut Pas Être Vide",
@@ -51,7 +79,21 @@ static const Map<String,dynamic> fr = {
   "enteryourpassword": "Entrer Votre Mot De Passe",
   "nicknamecantbeempty": "Le Surnom Ne Peut Pas Être Vide",
   "nickname": "Surnom",
-  "enteryournickname": "Entrer Votre Surnom"
+  "enteryournickname": "Entrer Votre Surnom",
+  "team": "Équipe",
+  "logout": "SE DÉCONNECTER",
+  "settings": "Paramètres",
+  "myProfile": "Mon Profil",
+  "publicCanals": "Canaux Publics",
+  "privateCanals": "Canaux Privés",
+  "directMessages": "Messages Directs",
+  "darkMode": "Mode Sombre",
+  "language": "Langue",
+  "createNewCanal": "Créer Un Nouveau Canal",
+  "canalName": "Nom Du Canal",
+  "add": "Ajouter",
+  "cancel": "Annuler",
+  "yes": "Oui"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en, "fr": fr};
 }

@@ -9,5 +9,19 @@
   "enteryourpassword": "ادخل كلمة السر",
   "nicknamecantbeempty": "لا يمكن أن يكون الاسم المستعار فارغًا",
   "nickname": "اسم مستعار",
-  "enteryournickname": "أدخل اسمك المستعار"
+  "enteryournickname": "أدخل اسمك المستعار",
+  "team": "فريق",
+  "logout": "تسجيل الخروج",
+  "settings": "إعدادات",
+  "myProfile": "ملفي",
+  "publicCanals": "القنوات العامة",
+  "privateCanals": "القنوات الخاصة",
+  "directMessages": "رسائل مباشرة",
+  "darkMode": "الوضع الداكن",
+  "language": "اللغة",
+  "createNewCanal": "إنشاء قناة جديدة",
+  "canalName": "إسم القناة",
+  "add": "إضافة",
+  "cancel": "إلغاء",
+  "yes": "نعم"
 }

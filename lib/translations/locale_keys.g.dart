@@ -12,5 +12,19 @@ abstract class  LocaleKeys {
   static const nicknamecantbeempty = 'nicknamecantbeempty';
   static const nickname = 'nickname';
   static const enteryournickname = 'enteryournickname';
+  static const team = 'team';
+  static const logout = 'logout';
+  static const settings = 'settings';
+  static const myProfile = 'myProfile';
+  static const publicCanals = 'publicCanals';
+  static const privateCanals = 'privateCanals';
+  static const directMessages = 'directMessages';
+  static const darkMode = 'darkMode';
+  static const language = 'language';
+  static const createNewCanal = 'createNewCanal';
+  static const canalName = 'canalName';
+  static const add = 'add';
+  static const cancel = 'cancel';
+  static const yes = 'yes';
 
 }

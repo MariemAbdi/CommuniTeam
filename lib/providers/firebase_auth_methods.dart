@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../models/user.dart' as user_model;
 
 class FirebaseAuthMethods{
   final FirebaseAuth _auth;
@@ -29,6 +33,9 @@ class FirebaseAuthMethods{
 
       await _auth.createUserWithEmailAndPassword(email: email, password: password);
       user.updateDisplayName(nickname);
+
+      //Create A New User & Add It To The Firestore Database
+      user_model.createUser(user_model.User(nickname:nickname), email);
 
       //POP LOADING CIRCLE
       Navigator.pop(context);

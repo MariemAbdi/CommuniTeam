@@ -9,5 +9,19 @@
   "enteryourpassword": "Entrer Votre Mot De Passe",
   "nicknamecantbeempty": "Le Surnom Ne Peut Pas Être Vide",
   "nickname": "Surnom",
-  "enteryournickname": "Entrer Votre Surnom"
+  "enteryournickname": "Entrer Votre Surnom",
+  "team": "Équipe",
+  "logout": "SE DÉCONNECTER",
+  "settings": "Paramètres",
+  "myProfile": "Mon Profil",
+  "publicCanals": "Canaux Publics",
+  "privateCanals": "Canaux Privés",
+  "directMessages": "Messages Directs",
+  "darkMode": "Mode Sombre",
+  "language": "Langue",
+  "createNewCanal": "Créer Un Nouveau Canal",
+  "canalName": "Nom Du Canal",
+  "add": "Ajouter",
+  "cancel": "Annuler",
+  "yes": "Oui"
 }
