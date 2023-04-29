@@ -24,4 +24,32 @@ class FirestoreMethods{
       'members': [owner],
     }).then((documentSnapshot) => debugPrint("Added Data with ID: ${documentSnapshot.id}"));
   }
+
+  //DELETE CHANNEL
+  Future<void> deleteCanal(String teamID, String channelId) {
+    // Call the  CollectionReference to delete the document
+    return teams.doc(teamID)
+        .collection('channels')
+        .doc(channelId)
+        .delete()
+        .then((value) => debugPrint("Canal Deleting success"))
+        .catchError((error) => print("Erreur lors de la suppression du canal: $error"));
+  }
+
+  Future<void> editCanal(String teamId, String channelId, String newName) {
+
+    if (newName.isEmpty) {
+      print('name can not be empty');
+      return Future.error('name can not be empty');
+    }
+
+    CollectionReference channel = FirebaseFirestore.instance.collection('teams').doc(teamId).collection('channels');
+    DocumentReference channelDoc = channel.doc(channelId);
+
+    return channelDoc.update({'name': newName}).then((value) => print('updating success'))
+        .catchError((error) => print('Error when updating name: $error'));
+  }
+
+
+
 }

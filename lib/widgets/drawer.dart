@@ -21,11 +21,28 @@ class DrawerWidget extends StatefulWidget {
 
 class _DrawerWidgetState extends State<DrawerWidget> {
 
-  final user = FirebaseAuth.instance.currentUser!;
+
+  //final user = FirebaseAuth.instance.currentUser;
+
+  late final User user;
+  late final String? userEmail;
+
+
+
+
+
+
   List<String> teams=[];
   List<String> teamsIDS=[];
   List<String> publicCanalsList=[];
   List<String> privateCanalsList=[];
+
+  List<String> privateIds = [];
+  List<String> publicIds = [];
+
+  List<String> privateOwners = [];
+  List<String> publicOwners = [];
+
   List<dynamic> allUsers =[];
 
   String dropdownValue = "ISET RADES";
@@ -80,31 +97,64 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
     });
   }
-  
+
+
+
+
   //GET THE CANALS
   getCanals(String id) async {
-      await FirebaseFirestore.instance
-          .collection("teams")
-          .doc(id).collection("channels").snapshots().forEach((element) {
-            List<String> public=[];
-            List<String> private=[];
-            for (var value in element.docs) {
-              if(value['private']){
-                private.add(value['name']);
-              }else{
-                public.add(value['name']);
-              }
-            }
-            setState(() {
-              privateCanalsList=private;
-              publicCanalsList=public;
-            });
+
+    await FirebaseFirestore.instance
+        .collection("teams")
+        .doc(id)
+        .collection("channels")
+        .snapshots()
+        .forEach((element) {
+
+      List<String> public=[];
+      List<String> private=[];
+
+      List<String> privateIdsLocal=[];
+      List<String> privateOwnersLocal=[];
+
+      List<String> publicIdsLocal=[];
+      List<String> publicOwnersLocal=[];
+
+      for (var value in element.docs) {
+        if(value['private']){
+          private.add(value['name']);
+          privateIdsLocal.add(value.id);
+          privateOwnersLocal.add(value['members'][0]);
+
+        } else {
+          public.add(value['name']);
+          publicIdsLocal.add(value.id);
+          publicOwnersLocal.add(value['members'][0]);
+        }
+
+      }
+      setState(() {
+
+        privateCanalsList=private;
+        publicCanalsList=public;
+
+        privateIds= privateIdsLocal;
+        publicIds=publicIdsLocal;
+
+        privateOwners=privateOwnersLocal;
+        publicOwners=publicOwnersLocal;
+
       });
+    });
+
   }
+
 
   @override
   void initState() {
     super.initState();
+    user = FirebaseAuth.instance.currentUser!;
+    userEmail = user.email;
     getTeams();
     getUsers("toBCHluEdzfmeoXhCxQw");
     getCanals("toBCHluEdzfmeoXhCxQw");
@@ -151,7 +201,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     //---------------------------PUBLIC CHANNELS---------------------------------------
                     channelAddition(LocaleKeys.publicCanals.tr(),publicCanals, (){
                       setState(() {
-                        publicCanals=!publicCanals;
+                        publicCanals=!publicCanals ;
                       });
                     },false),
 
@@ -165,7 +215,22 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (BuildContext context, int index){
 
-                            return DrawerItemCanal(name: publicCanalsList[index]);
+                            return DrawerItemCanal(name: publicCanalsList[index], id: publicIds[index], isOwner: (userEmail == publicOwners[index] ),
+
+                                    onDeleteChannel: () {
+                                      FirestoreMethods firestoreMethods= FirestoreMethods();
+                                      firestoreMethods.deleteCanal('toBCHluEdzfmeoXhCxQw',publicIds[index]);
+                                      getCanals('toBCHluEdzfmeoXhCxQw');
+                                    },
+
+                                    onEditChannel: (text) {
+                                      FirestoreMethods firestoreMethods= FirestoreMethods();
+                                      firestoreMethods.editCanal('toBCHluEdzfmeoXhCxQw',publicIds[index], text);
+
+                                      getCanals('toBCHluEdzfmeoXhCxQw');
+                                    }
+
+                                );
 
                           }),
                       ),
@@ -192,7 +257,21 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             physics: const ClampingScrollPhysics(),
                             itemBuilder: (BuildContext context, int index){
 
-                              return DrawerItemCanal(name: privateCanalsList[index]);
+                              return DrawerItemCanal(name: privateCanalsList[index],id: privateIds[index],isOwner: (userEmail == privateOwners[index] ),
+                                  onDeleteChannel: () {
+                                    FirestoreMethods firestoreMethods= FirestoreMethods();
+                                    firestoreMethods.deleteCanal('toBCHluEdzfmeoXhCxQw',privateIds[index]);
+                                    getCanals('toBCHluEdzfmeoXhCxQw');
+                                  },
+
+                                  onEditChannel: (text) {
+                                    FirestoreMethods firestoreMethods= FirestoreMethods();
+                                    firestoreMethods.editCanal('toBCHluEdzfmeoXhCxQw',privateIds[index], text);
+                                    getCanals('toBCHluEdzfmeoXhCxQw');
+
+                                  }
+
+                                  );
 
                             }),
                       ),

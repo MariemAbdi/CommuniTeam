@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class CustomAppbar extends StatefulWidget implements PreferredSizeWidget {
+class CustomAppbar extends StatefulWidget implements PreferredSizeWidget{
   final String title;
   const CustomAppbar({Key? key, required this.title}) : super(key: key);
 
