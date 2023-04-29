@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -98,7 +97,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
                     ),
                     title: Text(
                       allUsers[index]["nickname"],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -147,7 +146,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
       title: Text(widget.title),
       actions: <Widget>[
         IconButton(
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
           onPressed: addingTeammate,
         ),
       ],

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:communiteam/resources/firestore_methods.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,10 +36,17 @@ class FirebaseAuthMethods{
       user.updateDisplayName(nickname);
 
       //Create A New User & Add It To The Firestore Database
-      user_model.createUser(user_model.User(nickname:nickname), email);
+      user_model.createUser(user_model.User(email: email,nickname:nickname), email);
+      //ADD THE NEW USER TO THE GLOBAL TEAM CALLED ISET RADES
+      FirestoreMethods firestoreMethods =FirestoreMethods();
+      firestoreMethods.addMemberToTeam(email);
 
       //POP LOADING CIRCLE
-      Navigator.pop(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+        // then execute the navigation code.
+        Navigator.pop(context);
+      });
 
     }on FirebaseAuthException catch(e){
         customSnackBar(context, e.message!, Colors.red);

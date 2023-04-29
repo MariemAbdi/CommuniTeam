@@ -2,17 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../models/user_model.dart';
 import '../services/Theme/custom_theme.dart';
 import '../widgets/message_textfield.dart';
 import '../widgets/single_message.dart';
 
 class DirectChatScreen extends StatefulWidget {
   final String receiverId;
-
-  DirectChatScreen({
-    required this.receiverId,
-  });
+  const DirectChatScreen({super.key, required this.receiverId,});
 
   @override
   State<DirectChatScreen> createState() => _DirectChatScreenState();
@@ -51,59 +47,55 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
           children: [
             //PROFILE PICTURE
             
-            SizedBox(
+            const SizedBox(
               width: 5,
             ),
             Text(
               nickname,
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             )
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-              child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(25),
-                    topRight: Radius.circular(25))),
-            child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(user.email)
-                    .collection('messages')
-                    .doc(widget.receiverId)
-                    .collection('chats')
-                    .orderBy("date", descending: true)
-                    .snapshots(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data.docs.length < 1) {
-                      return Center(
-                        child: Text("Say Hi"),
-                      );
-                    }
-                    return ListView.builder(
-                        itemCount: snapshot.data.docs.length,
-                        reverse: true,
-                        physics: BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          bool isMe = snapshot.data.docs[index]['senderId'] ==
-                              user.email;
-                          return SingleMessage(
-                              message: snapshot.data.docs[index]['message'],
-                              isMe: isMe);
-                        });
-                  }
-                  return Center(child: CircularProgressIndicator());
-                }),
-          )),
-          MessageTextField(user.email!, widget.receiverId),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Expanded(
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(user.email)
+                        .collection('messages')
+                        .doc(widget.receiverId)
+                        .collection('chats')
+                        .orderBy("date", descending: true)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data.docs.length < 1) {
+                          return const Center(
+                            child: Text("Say Hi"),
+                          );
+                        }
+                        return ListView.builder(
+                            itemCount: snapshot.data.docs.length,
+                            reverse: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              bool isMe = snapshot.data.docs[index]['senderId'] ==
+                                  user.email;
+                              return SingleMessage(
+                                  message: snapshot.data.docs[index]['message'],
+                                  isMe: isMe);
+                            });
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    })),
+
+            MessageTextField(receiverId: widget.receiverId),
+          ],
+        ),
       ),
     );
   }

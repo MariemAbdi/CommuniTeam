@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User{
+  late String email;
   late String nickname;
   late String bio;
 
-  User({required this.nickname, this.bio="Hello World!"});
+  User({required this.email, required this.nickname, this.bio="Hello World!"});
 
   Map<String,dynamic> toJson()=>{
+    'email': email,
     'nickname': nickname,
     'bio': bio,
   };
 
   static User fromJson(Map<String,dynamic> json){
     return User(
+      email: json['email'],
       nickname: json['nickname'],
       bio: json['bio'],
     );}
@@ -33,7 +36,3 @@ Future<void> createUser(User user,String userID) async {
 
 }
 
-//GET A LIST OF ALL THE DOCUMENTS IN THE COLLECTION
-Stream<List<User>> getAllUsers()=>
-    FirebaseFirestore.instance.collection('users').orderBy('nickname').snapshots().map((snapshot) => snapshot.docs.map((doc) =>
-        User.fromJson(doc.data())).toList());

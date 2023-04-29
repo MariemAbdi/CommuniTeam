@@ -1,7 +1,6 @@
 import 'package:communiteam/widgets/adding_appbar.dart';
-import 'package:communiteam/widgets/chat_item.dart';
-import 'package:communiteam/widgets/custom_appbar.dart';
 import 'package:communiteam/widgets/drawer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../resources/firestore_methods.dart';
@@ -24,6 +23,7 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async => false,
       child: Scaffold(
         appBar: const AddingAppbar(title: "Channel Name",),
+        //drawer: const DrawerWidget(),
         drawer: const DrawerWidget(),
         body: Container(),
       ),

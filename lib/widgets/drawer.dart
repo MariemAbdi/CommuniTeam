@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:communiteam/resources/firestore_methods.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
-import 'package:communiteam/widgets/drawer_item_canal.dart';
+import 'package:communiteam/services/firebase_storage_services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../models/team.dart';
 import '../providers/firebase_auth_methods.dart';
+import '../resources/firestore_methods.dart';
 import '../translations/locale_keys.g.dart';
+import 'drawer_item_canal.dart';
 import 'drawer_item_direct.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -20,94 +23,42 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-
   final user = FirebaseAuth.instance.currentUser!;
-  List<String> teams=[];
-  List<String> teamsIDS=[];
-  List<String> publicCanalsList=[];
-  List<String> privateCanalsList=[];
-  List<dynamic> allUsers =[];
-
   String dropdownValue = "ISET RADES";
+  List<Team> teams = [];
+  Storage storage = Storage();
+
+  late String selectedTeamId = "toBCHluEdzfmeoXhCxQw";
 
   bool publicCanals=false;
   bool privateCanals=false;
   bool directMessages=false;
+  bool isMember= false;
 
-
-  //GET THE TEAMS NAMES
   getTeams() async {
     await FirebaseFirestore.instance
-        .collection("teams").snapshots().forEach((element) {
-          List<String> namesList=[];
-          List<String> idsList=[];
+        .collection("teams").where("members", arrayContains: user.email!)
+        .snapshots()
+        .forEach((element) {
+      List<Team> list = [];
       for (var value in element.docs) {
-          namesList.add(value['name']);
-          idsList.add(value['id']);
+        Team team = Team(
+            id: value['id'],
+            name: value['name'],
+            members: value['members'].cast<String>());
+          list.add(team);
       }
       setState(() {
-        teams=namesList;
-        teams.add("Create Team+");
-
-        teamsIDS=idsList;
-
+        teams = list;
       });
     });
   }
 
-  //GET ALL THE USERS IN A SPECIFIC TEAM
-  getUsers(String id) async {
-    await FirebaseFirestore.instance
-        .collection("teams")
-        .doc(id)
-        .get()
-        .then((value) async {
-
-          // get users Ids
-      List<String> members = List.from(value.data()!["members"]);
-
-      // loop through all ids and get associated user object by userID/followerID
-      for (int i = 0; i < members.length; i++) {
-        var userId = members[i];
-        var data = await FirebaseFirestore.instance
-            .collection("users")
-            .doc(userId)
-            .get();
-
-        allUsers.add(data);
-      }
-      setState(() {
-      });
-    });
-  }
-  
-  //GET THE CANALS
-  getCanals(String id) async {
-      await FirebaseFirestore.instance
-          .collection("teams")
-          .doc(id).collection("channels").snapshots().forEach((element) {
-            List<String> public=[];
-            List<String> private=[];
-            for (var value in element.docs) {
-              if(value['private']){
-                private.add(value['name']);
-              }else{
-                public.add(value['name']);
-              }
-            }
-            setState(() {
-              privateCanalsList=private;
-              publicCanalsList=public;
-            });
-      });
-  }
 
   @override
   void initState() {
     super.initState();
     getTeams();
-    getUsers("toBCHluEdzfmeoXhCxQw");
-    getCanals("toBCHluEdzfmeoXhCxQw");
   }
 
   @override
@@ -118,38 +69,59 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraint.maxHeight * 0.95),
+              constraints:
+                  BoxConstraints(minHeight: constraint.maxHeight * 0.95),
+              //IntrinsicHeight IS USED SO THAT EXPANDED DOES NOT TAKE THE WHOLE DRAWER
               child: IntrinsicHeight(
                 child: Column(
-                  children: <Widget>[
+                  children: [
 
-                    //PROFILE PICTURE
-                    Container(
-                      width: MediaQuery.of(context).size.width*0.3,
-                      height: MediaQuery.of(context).size.width*0.3,
-                      decoration: const BoxDecoration(
-                        color: CustomTheme.green,
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: AssetImage("assets/images/placeholder.png"),
-                        ))),
+                    //---------------------------PROFILE PICTURE & NAME---------------------------------------
+                    FutureBuilder(
+                      future: storage.downloadURL("profile pictures", user.email!),
+                      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                        if(!snapshot.hasData){
+                          return Container(
+                              width: MediaQuery.of(context).size.width*0.3,
+                              height: MediaQuery.of(context).size.width*0.3,
+                              decoration: const BoxDecoration(
+                                  color: Colors.grey,
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: AssetImage("assets/images/avatar3.png"),
+                                  )));
+                        }
+                        if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
+                          return  Container(
+                              width: MediaQuery.of(context).size.width*0.3,
+                              height: MediaQuery.of(context).size.width*0.3,
+                              decoration: BoxDecoration(
+                                  color: CustomTheme.green,
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: NetworkImage(snapshot.data!),
+                                  )));
+                        }
+
+                        return const Center(child: CircularProgressIndicator(color: CustomTheme.white,),);
+                      },
+                    ),
 
                     const SizedBox(height: 10,),
 
                     //THE USER'S USERNAME
                     Text(user.displayName!,style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white, overflow: TextOverflow.ellipsis),)),
-
-                    //SOME SPACE
-                    const SizedBox(height: 10,),
-
                     //---------------------------TEAMS---------------------------------------
 
-                    //TEAM DROPDOWN
-                    teamWidget(),
+                    teamRow(Icons.group, LocaleKeys.team.tr(), () { }),
 
-                    //---------------------------PUBLIC CHANNELS---------------------------------------
-                    channelAddition(LocaleKeys.publicCanals.tr(),publicCanals, (){
+                    teamDropDown(),
+
+                    const Divider(),
+                    //---------------------------PUBLIC CANALS---------------------------------------
+                    canalRow(Icons.public,LocaleKeys.publicCanals.tr(),publicCanals, (){
                       setState(() {
                         publicCanals=!publicCanals;
                       });
@@ -158,146 +130,181 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     Visibility(
                       visible: publicCanals,
                       child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
-                      child: ListView.builder(
-                          itemCount: publicCanalsList.length,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index){
-
-                            return DrawerItemCanal(name: publicCanalsList[index]);
-
-                          }),
-                      ),
-                    ),
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("teams")
+                                .doc(selectedTeamId).collection("publicCanals").orderBy("name").snapshots(),
+                            builder: (context, AsyncSnapshot snapshot){
+                              if(snapshot.hasData){
+                                final canals = snapshot.data!.docs;
+                                return ListView.builder(
+                                    itemCount: canals.length,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    physics: const ClampingScrollPhysics(),
+                                    itemBuilder: (BuildContext context, int index){
+                                      return DrawerItemCanal(canalId:canals[index]["id"], canalName: canals[index]['name'], isOwner: user.email == canals[index]['owner'], collectionName: 'publicCanals', teamId: selectedTeamId,);
+                                    });
+                              }
+                              return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
+                            },
+                          )
+                      ),),
 
                     //HORIZONTAL LINE
                     const Divider(),
 
-                    //---------------------------PRIVATE CHANNELS---------------------------------------
-                    channelAddition(LocaleKeys.privateCanals.tr(), privateCanals,(){
-                    setState(() {
-                    privateCanals=!privateCanals;
-                    });
+                    //---------------------------PRIVATE CANALS---------------------------------------
+                    canalRow(Icons.lock,LocaleKeys.privateCanals.tr(),privateCanals, (){
+                      setState(() {
+                        privateCanals=!privateCanals;
+                      });
                     },true),
 
                     Visibility(
                       visible: privateCanals,
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height*0.2,
-                        child: ListView.builder(
-                            itemCount: privateCanalsList.length,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            physics: const ClampingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index){
-
-                              return DrawerItemCanal(name: privateCanalsList[index]);
-
-                            }),
-                      ),
-                    ),
+                      child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("teams")
+                                .doc(selectedTeamId).collection("privateCanals").where("members", arrayContains: user.email!).orderBy("name").snapshots(),
+                            builder: (context, AsyncSnapshot snapshot){
+                              if(snapshot.hasData){
+                                final canals = snapshot.data!.docs;
+                                return ListView.builder(
+                                    itemCount: canals.length,
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    physics: const ClampingScrollPhysics(),
+                                    itemBuilder: (BuildContext context, int index){
+                                      return Visibility(
+                                        visible: true,
+                                          child: DrawerItemCanal(canalId: canals[index]['id'], canalName: canals[index]['name'], isOwner: user.email! == canals[index]["members"][0], collectionName: "privateCanals", teamId: selectedTeamId,));
+                                    });
+                              }
+                              return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
+                            },
+                          )
+                      ),),
 
                     //HORIZONTAL LINE
                     const Divider(),
 
                     //---------------------------DIRECT MESSAGES---------------------------------------
-                    channelAddition(LocaleKeys.directMessages.tr(),directMessages,() {
-                    setState(() {
-                    directMessages=!directMessages;
-                    });
-                    },true),
+                    canalRow(Icons.message, LocaleKeys.directMessages.tr(), directMessages, () {
+                      setState(() {
+                        directMessages=!directMessages;
+                      });
+                    }, false),
 
                     Visibility(
-                      visible: directMessages,
-                      child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
-                        child: ListView.builder(
-                            itemCount: allUsers.length,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            physics: const ClampingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index){
-                              return DrawerItemDirect(name: allUsers[index]["nickname"], receiverId: allUsers[index]["email"]);
-                            }),),
-                    ),
+                                visible: directMessages,
+                                child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
+                                  child: StreamBuilder(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("teams")
+                                        .doc(selectedTeamId).snapshots(),
+                                    builder: (context, AsyncSnapshot snapshot){
+                                      if(snapshot.hasData){
+                                        DocumentSnapshot item = snapshot.data!;
+                                        List<String> members = item['members'].cast<String>();
+                                        //REMOVE THE CURRENT USER
+                                        members.removeWhere((element) => element==user.email!);
+                                        return ListView.builder(
+                                            itemCount: members.length,
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            physics: const ClampingScrollPhysics(),
+                                            itemBuilder: (BuildContext context, int index){
+                                              return FutureBuilder<DocumentSnapshot>(
+                                                  future: FirebaseFirestore.instance
+                                                      .collection("users")
+                                                      .doc(members[index]).get(),
+                                                  builder:(BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot){
+                                                    if(snapshot.hasData){
+                                                      Map<String, dynamic> usersList = snapshot.data!.data() as Map<String, dynamic>;
+
+                                                      return DrawerItemDirect(name: usersList["nickname"]!, receiverId: usersList["email"]!);
+                                                    }
+                                                    return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
+                                              });
+
+                                            });
+                                      }
+                                      return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
+                                    },
+                                  )
+                              ),),
 
                     //SOME SPACE
                     const Expanded(child: SizedBox()),
 
-                    //PROFILE AND SETTINGS BUTTONS
+                    //---------------------------PROFILE, SETTINGS & LOGOUT BUTTONS---------------------------
                     Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Column(
-                                  children: [
-                                    //HORIZONTAL LINE
-                                    const Divider(),
+                      alignment: Alignment.bottomLeft,
+                      child: Column(
+                        children: [
+                          //HORIZONTAL LINE
+                          const Divider(),
 
-                                    //GO TO PROFILE
-                                    bottomListTile(LocaleKeys.myProfile.tr(), Icons.account_circle, () {
-                                      Navigator.pop(context);
-                                      Navigator.of(context).pushReplacementNamed('/profile');
+                          //GO TO PROFILE
+                          bottomListTile(LocaleKeys.myProfile.tr(), Icons.account_circle, () {
+                            Navigator.pop(context);
+                            Navigator.of(context).pushReplacementNamed('/profile');
+                          }),
 
-                                      // Navigator.of(context).push(MaterialPageRoute(
-                                      //     builder: (context) => const ProfileScreen()));
-                                    }),
+                          //GO TO SETTINGS
+                          bottomListTile(LocaleKeys.settings.tr(), Icons.settings, () {
+                            Navigator.pop(context);
+                            Navigator.of(context).pushReplacementNamed('/settings');
+                          }),
 
-                                    //GO TO SETTINGS
-                                    bottomListTile(LocaleKeys.settings.tr(), Icons.settings, () {
-                                      // Navigator.pop(context);
-                                      // Navigator.of(context).push(MaterialPageRoute(
-                                      //     builder: (context) => const SettingsScreen()));
-                                      Navigator.pop(context);
-                                      Navigator.of(context).pushReplacementNamed('/settings');
-                                    }),
+                          const Divider(),
 
-                                    const Divider(),
-
-                      bottomListTile(LocaleKeys.logout.tr(), Icons.power_settings_new, () {
-                        showCupertinoModalPopup(context: context, builder: (BuildContext context){
-                          return AlertDialog(
-                            actionsAlignment: MainAxisAlignment.start,
-                            title: Text(
-                              LocaleKeys.logout.tr(),
-                              style:
-                              GoogleFonts.robotoCondensed(),
-                            ),
-                            content: const Text("Would you like to logout?"),
-                            actions: [
-                              TextButton(
-                                child: Text(
-                                  LocaleKeys.yes.tr(),
-                                  style: GoogleFonts
-                                      .robotoCondensed(),
-                                ),
-                                onPressed: () {
-                                  // FirebaseAuth.instance.signOut();
-                                  context.read<FirebaseAuthMethods>().signOut(context);
-                                },
-                              ),
-                              TextButton(
-                                child: Text(
-                                  LocaleKeys.cancel.tr(),
+                          //LOGOUT
+                          bottomListTile(LocaleKeys.logout.tr(), Icons.power_settings_new, () {
+                            showCupertinoModalPopup(context: context, builder: (BuildContext context){
+                              return AlertDialog(
+                                actionsAlignment: MainAxisAlignment.start,
+                                title: Text(
+                                  LocaleKeys.logout.tr(),
                                   style:
-                                  GoogleFonts.robotoCondensed(
-                                      color:
-                                      Colors.red),
+                                  GoogleFonts.robotoCondensed(),
                                 ),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop();
-                                },
-                              ),
-                            ],
-                          );
+                                content: const Text("Would you like to logout?"),
+                                actions: [
+                                  TextButton(
+                                    child: Text(
+                                      LocaleKeys.yes.tr(),
+                                      style: GoogleFonts
+                                          .robotoCondensed(),
+                                    ),
+                                    onPressed: () {
+                                      context.read<FirebaseAuthMethods>().signOut(context);
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text(
+                                      LocaleKeys.cancel.tr(),
+                                      style:
+                                      GoogleFonts.robotoCondensed(
+                                          color:
+                                          Colors.red),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop();
+                                    },
+                                  ),
+                                ],
+                              );
 
-                        });
-                      }),
+                            });
+                          }),
 
 
-                                  ],
-                                ),),
-
-
+                        ],
+                      ),),
                   ],
                 ),
               ),
@@ -308,25 +315,124 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-  //CHANNEL NAME AND FUNCTION
-  Widget channelAddition(String name,bool visibility, VoidCallback showHide,bool isPrivate){
+  //CANAL ICON, NAME AND ADD FUNCTION
+  Widget canalRow(IconData icon,String name,bool visibility, VoidCallback showHide,bool isPrivate){
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         InkWell(
           onTap: showHide,
           child: Row(children: [
-            Text(name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, overflow: TextOverflow.ellipsis, color: Colors.white)),),
-            Icon(visibility?Icons.keyboard_arrow_up:Icons.keyboard_arrow_down, color: Colors.white,),
+            Row(
+              children: [
+                Icon(icon ,color: Colors.white, size: 20,),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, overflow: TextOverflow.ellipsis, color: Colors.white)),),
+              ],
+            ),
+            Icon(visibility?Icons.keyboard_arrow_up:Icons.keyboard_arrow_down, color: Colors.white, size: 18,),
           ],),
         ),
         IconButton(onPressed: (){
           showCupertinoModalPopup(context: context, builder: (BuildContext context){
-            return createCanal(isPrivate);
+            String canalName = "";
+            return AlertDialog(
+              actionsAlignment: MainAxisAlignment.start,
+              title: Text(
+                LocaleKeys.createNewCanal.tr(),
+                style: GoogleFonts.robotoCondensed(),
+              ),
+              content: TextFormField(
+                decoration: InputDecoration(hintText: LocaleKeys.canalName.tr()),
+                onChanged: (name) {
+                  canalName = name;
+                },
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    LocaleKeys.add.tr(),
+                    style: GoogleFonts.robotoCondensed(),
+                  ),
+                  onPressed: () {
+                    if (canalName.isNotEmpty) {
+                      FirestoreMethods firestoreMethods = FirestoreMethods();
+                      firestoreMethods.addCanal(context, selectedTeamId, canalName, isPrivate, user.email!);
+                    }
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text(
+                    LocaleKeys.cancel.tr(),
+                    style: GoogleFonts.robotoCondensed(color: Colors.red),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
           });
-
-        }, icon: const Icon(Icons.add_circle, color: Colors.white))
+        }, icon: const Icon(Icons.add_circle, color: Colors.white, size: 20,))
       ],);
+  }
+
+  //TEAM NAME AND FUNCTION
+  Widget teamRow(IconData icon,String name,VoidCallback function){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(icon,color: Colors.white,size: 20,),
+            const SizedBox(
+              width: 5,
+            ),
+            Text(name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, overflow: TextOverflow.ellipsis, color: Colors.white)),),
+          ],
+        ),
+        IconButton(onPressed: function, icon: const Icon(Icons.add_circle, color: Colors.white, size: 20,))
+      ],);
+  }
+
+  //TEAM DROPDOWN WIDGET
+  Widget teamDropDown(){
+    return DropdownButton<String>(
+        value: dropdownValue,
+        style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 19,
+            overflow: TextOverflow.ellipsis),
+        isExpanded: true,
+        icon: const Icon(Icons.keyboard_arrow_down,
+            color: Colors.white),
+        iconSize: 20,
+        dropdownColor: Colors.grey,
+        borderRadius: BorderRadius.circular(12),
+        underline: Container(),
+        items: teams.map<DropdownMenuItem<String>>((Team value) {
+          return DropdownMenuItem<String>(
+            value: value.name,
+            child: Text(
+              value.name,
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            onTap: () {
+              setState(() {
+                selectedTeamId = value.id;
+              });
+            },
+          );
+        }).toList(),
+        onChanged: (String? newValue) async {
+          setState(() {
+            dropdownValue = newValue!;
+          });
+        });
   }
 
   //CUSTOM LIST TILE
@@ -340,85 +446,4 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-  //TEAM GROUP DROPDOWN
-  Widget teamWidget(){
-    return DropdownButton<String>(
-        value: dropdownValue,
-        style: const TextStyle(color: Colors.white,fontWeight: FontWeight.w700, fontSize: 19, overflow: TextOverflow.ellipsis),
-        isExpanded: true,
-        icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-        dropdownColor: Colors.grey,
-        borderRadius: BorderRadius.circular(12),
-        underline: Container(),
-        items: teams
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: GoogleFonts.robotoCondensed(),
-            ),
-          );
-        }).toList(),
-        onChanged: (String? newValue) async {
-          setState(() {
-            dropdownValue = newValue!;
-          });
-
-        });
-  }
-
-  //CANAL CREATION
-  createCanal(bool isPrivate){
-    String channelName="";
-    return AlertDialog(
-      actionsAlignment:
-      MainAxisAlignment.start,
-      title: Text(
-        LocaleKeys.createNewCanal.tr(),
-        style:
-        GoogleFonts.robotoCondensed(),
-      ),
-      content: TextFormField(
-        decoration: InputDecoration(
-          hintText: LocaleKeys.canalName.tr()
-        ),
-        onChanged: (name) {
-          channelName = name;
-        },
-      ),
-      actions: [
-        TextButton(
-          child: Text(
-            LocaleKeys.add.tr(),
-            style: GoogleFonts
-                .robotoCondensed(),
-          ),
-          onPressed: () {
-            if(channelName.isNotEmpty){
-              FirestoreMethods firestoreMethods= FirestoreMethods();
-              firestoreMethods.addCanal("toBCHluEdzfmeoXhCxQw", channelName, isPrivate,user.email!);
-
-              //customSnackBar(context, "Canal Created Successfully!", Colors.green);
-            }
-            Navigator.of(context)
-                .pop();
-          },
-        ),
-        TextButton(
-          child: Text(
-            LocaleKeys.cancel.tr(),
-            style:
-            GoogleFonts.robotoCondensed(
-                color:
-                Colors.red),
-          ),
-          onPressed: () {
-            Navigator.of(context)
-                .pop();
-          },
-        ),
-      ],
-    );
-  }
 }

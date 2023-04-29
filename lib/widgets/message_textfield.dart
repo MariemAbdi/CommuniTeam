@@ -1,81 +1,98 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/services/Theme/custom_theme.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
 class MessageTextField extends StatefulWidget {
-  final String currentId;
-  final String friendId;
-
-  MessageTextField(this.currentId,this.friendId);
+  final String receiverId;
+  const MessageTextField({Key? key, required this.receiverId}) : super(key: key);
 
   @override
-  _MessageTextFieldState createState() => _MessageTextFieldState();
+  MessageTextFieldState createState() => MessageTextFieldState();
 }
 
-class _MessageTextFieldState extends State<MessageTextField> {
-  TextEditingController _controller = TextEditingController();
+class MessageTextFieldState extends State<MessageTextField> {
+
+  final user = FirebaseAuth.instance.currentUser!;
+  final TextEditingController _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
        color: Colors.white,
-       padding: EdgeInsetsDirectional.all(8),
+       padding: const EdgeInsetsDirectional.all(8),
        child: Row(
          children: [
-           Expanded(child: TextField(
-             controller: _controller,
-              decoration: InputDecoration(
-                labelText:"Type your Message",
-                fillColor: Colors.grey[100],
-                filled: true,
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0),
-                  gapPadding: 10,
-                  borderRadius: BorderRadius.circular(25)
-                )
-              ),
+           Expanded(child: Theme(
+             data: CustomTheme.lightTheme,
+             child: TextFormField(
+               controller: _controller,
+                decoration: InputDecoration(
+                  labelText:"Type Your Message",
+                  fillColor: Colors.grey[100],
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: const BorderSide(width: 0),
+                    gapPadding: 10,
+                    borderRadius: BorderRadius.circular(25)
+                  ),
+                    suffixIcon: _controller.text.isEmpty
+                        ? null
+                        : IconButton(
+                      icon: const Icon(EvaIcons.close),
+                      onPressed: () {
+                        setState(() {
+                          _controller.clear();
+                        });
+                      },
+                    )
+                ),
+             ),
            )),
-           SizedBox(width: 20,),
+           const SizedBox(width: 20,),
            GestureDetector(
              onTap: ()async{
                String message = _controller.text;
                _controller.clear();
-               await FirebaseFirestore.instance.collection('users').doc(widget.currentId).collection('messages').doc(widget.friendId).collection('chats').add({
-                  "senderId":widget.currentId,
-                  "receiverId":widget.friendId,
-                  "message":message,
-                  "type":"text",
-                  "date":DateTime.now(),
+               await FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).collection('chats').add({
+                  "senderId": user.email!,
+                  "receiverId": widget.receiverId,
+                  "message": message,
+                  "type": "text",
+                  "date": DateTime.now(),
                }).then((value) {
-                 FirebaseFirestore.instance.collection('users').doc(widget.currentId).collection('messages').doc(widget.friendId).set({
+                 FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).set({
                      'last_msg':message,
                  });
                });
 
-               await FirebaseFirestore.instance.collection('users').doc(widget.friendId).collection('messages').doc(widget.currentId).collection("chats").add({
-                 "senderId":widget.currentId,
-                 "receiverId":widget.friendId,
-                 "message":message,
-                 "type":"text",
-                 "date":DateTime.now(),
+               await FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).collection("chats").add({
+                 "senderId": user.email!,
+                 "receiverId": widget.receiverId,
+                 "message" :message,
+                 "type": "text",
+                 "date": DateTime.now(),
 
                }).then((value){
-                 FirebaseFirestore.instance.collection('users').doc(widget.friendId).collection('messages').doc(widget.currentId).set({
+                 FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).set({
                    "last_msg":message
                  });
                });
              },
              child: Container(
-               padding: EdgeInsets.all(8),
-               decoration: BoxDecoration(
+               padding: const EdgeInsets.all(8),
+               decoration: const BoxDecoration(
                  shape: BoxShape.circle,
-                 color: Colors.blue,
+                 color: CustomTheme.darkPurple,
                ),
-               child: Icon(Icons.send,color: Colors.white,),
+               child: const Icon(Icons.send,color: Colors.white,),
              ),
            )
          ],
        ),
-      
+
     );
   }
 }

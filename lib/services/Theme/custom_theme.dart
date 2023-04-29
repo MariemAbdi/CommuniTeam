@@ -31,12 +31,13 @@ class CustomTheme{
     drawerTheme: const DrawerThemeData(
       elevation: 2.0,
       backgroundColor: darkPurple,
+
     ),
 
     inputDecorationTheme: InputDecorationTheme(
-        hintStyle: GoogleFonts.ptSans(),
-        labelStyle: GoogleFonts.ptSans(color: darkPurple),
-        errorStyle: GoogleFonts.ptSans(),
+        hintStyle: GoogleFonts.robotoCondensed(),
+        labelStyle: GoogleFonts.robotoCondensed(color: darkPurple),
+        errorStyle: GoogleFonts.robotoCondensed(),
         focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: darkPurple),),
         errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: darkPurple),),
         iconColor: darkPurple,
@@ -67,10 +68,10 @@ class CustomTheme{
 
     inputDecorationTheme: InputDecorationTheme(
         hintStyle: GoogleFonts.robotoCondensed(),
-        labelStyle: GoogleFonts.robotoCondensed(color: darkPurple),
+        labelStyle: GoogleFonts.robotoCondensed(color: white),
         errorStyle: GoogleFonts.robotoCondensed(),
-        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: darkPurple),),
-        errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: darkPurple),),
+        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.grey),),
+        errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.red),),
         iconColor: darkPurple,
         prefixStyle: const TextStyle(fontSize: 15)
     ),
