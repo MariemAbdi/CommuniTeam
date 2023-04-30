@@ -15,6 +15,7 @@ import '../translations/locale_keys.g.dart';
 import 'drawer_item_canal.dart';
 import 'drawer_item_direct.dart';
 
+
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({Key? key}) : super(key: key);
 
@@ -24,7 +25,7 @@ class DrawerWidget extends StatefulWidget {
 
 class _DrawerWidgetState extends State<DrawerWidget> {
   final user = FirebaseAuth.instance.currentUser!;
-  String dropdownValue = "ISET RADES";
+  String dropdownValue ="Iset Rades";
   List<Team> teams = [];
   Storage storage = Storage();
 
@@ -49,6 +50,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           list.add(team);
       }
       setState(() {
+
         teams = list;
       });
     });
@@ -115,7 +117,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     Text(user.displayName!,style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white, overflow: TextOverflow.ellipsis),)),
                     //---------------------------TEAMS---------------------------------------
 
-                    teamRow(Icons.group, LocaleKeys.team.tr(), () { }),
+                    teamRow(Icons.group, LocaleKeys.team.tr(), () {
+                          //GO TO ADD TEAM Screen
+                            Navigator.pop(context);
+                            Navigator.of(context).pushReplacementNamed('/add_new_team');
+
+                      }),
 
                     teamDropDown(),
 
@@ -445,5 +452,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       onTap: function,
     );
   }
+
+
+
+
 
 }

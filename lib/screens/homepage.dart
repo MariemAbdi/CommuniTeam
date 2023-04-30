@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async => false,
       child: Scaffold(
         appBar: const AddingAppbar(title: "Channel Name",),
-        //drawer: const DrawerWidget(),
         drawer: const DrawerWidget(),
         body: Container(),
       ),

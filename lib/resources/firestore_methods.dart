@@ -7,24 +7,29 @@ class FirestoreMethods{
   CollectionReference teams = FirebaseFirestore.instance.collection('teams');
 
   //CREATE NEW TEAM
-  Future<void> addTeam(String teamName) {
-    // Call the  CollectionReference to add a new document
+  Future<String> addTeam(String teamName) {
+    // Call the CollectionReference to add a new document
     return teams.add({
       'name': teamName,
       'members': [],
     }).then((value) {
-      //update the id
+      // Update the id
       teams.doc(value.id).update({
         "id": value.id
       });
+      return value.id; // Return the new team ID
     });
   }
 
-  addMemberToTeam(String userId){
-    teams.doc("toBCHluEdzfmeoXhCxQw").update({
+
+  addMemberToTeam(String teamId,String userId ){
+    teams.doc(teamId).update({
       "members": FieldValue.arrayUnion([userId])
     });
   }
+
+
+
 
   //CREATE NEW CHANNEL
   Future<void> addCanal(BuildContext context, String teamID, String canalName, bool isPrivate, String owner) async {

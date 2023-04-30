@@ -8,6 +8,7 @@ import '../../translations/locale_keys.g.dart';
 
 class EmailField extends StatefulWidget {
   final TextEditingController emailController;
+
   const EmailField({Key? key, required this.emailController}) : super(key: key);
 
   @override

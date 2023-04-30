@@ -37,9 +37,10 @@ class FirebaseAuthMethods{
 
       //Create A New User & Add It To The Firestore Database
       user_model.createUser(user_model.User(email: email,nickname:nickname), email);
+
       //ADD THE NEW USER TO THE GLOBAL TEAM CALLED ISET RADES
       FirestoreMethods firestoreMethods =FirestoreMethods();
-      firestoreMethods.addMemberToTeam(email);
+      firestoreMethods.addMemberToTeam("toBCHluEdzfmeoXhCxQw",email);
 
       //POP LOADING CIRCLE
       WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -1,6 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:communiteam/firebase_options.dart';
 import 'package:communiteam/providers/firebase_auth_methods.dart';
+import 'package:communiteam/screens/addNewTeam.dart';
 import 'package:communiteam/screens/auth.dart';
 import 'package:communiteam/screens/homepage.dart';
 import 'package:communiteam/screens/profile.dart';
@@ -80,6 +81,7 @@ class _MyAppState extends State<MyApp> {
         HomePage.routeName: (context) => const HomePage(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         ProfileScreen.routeName: (context) => const ProfileScreen(),
+        AddNewTeamScreen.routeName:(context)=>const AddNewTeamScreen(),
       },
     )
     );
