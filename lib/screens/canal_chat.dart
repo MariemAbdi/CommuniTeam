@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,11 +29,63 @@ class CanalChatScreen extends StatefulWidget {
 
 class _CanalChatScreenState extends State<CanalChatScreen> {
 
+  late User currentUser;
+  List<dynamic> allUsers =[];
+
+  getCanalUsers(String teamId, String canalType, String canalId) async {
+    if (canalType == "privateCanals") {
+      final canalSnapshot = await FirebaseFirestore.instance
+          .collection("teams")
+          .doc(teamId)
+          .collection(canalType)
+          .doc(canalId)
+          .get();
+
+      if (canalSnapshot.exists) {
+        final List<dynamic> members = canalSnapshot.data()!['members'];
+
+        for (int i = 0; i < members.length; i++) {
+          var userId = members[i];
+          var data = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .get();
+
+          allUsers.add(data);
+          setState(() {});
+        }
+      }
+    } else {
+      final canalSnapshot = await FirebaseFirestore.instance
+          .collection("teams")
+          .doc(teamId)
+          .get();
+
+      if (canalSnapshot.exists) {
+        final List<dynamic> members = canalSnapshot.data()!['members'];
+
+        for (int i = 0; i < members.length; i++) {
+          var userId = members[i];
+          var data = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .get();
+
+          allUsers.add(data);
+          setState(() {});
+        }
+      }
+    }
+  }
+
 
   @override
   void initState() {
     super.initState();
+    getCanalUsers(widget.teamId, widget.canalType,widget.canalId);
+     currentUser = FirebaseAuth.instance.currentUser!;
   }
+
 
 
   @override
@@ -56,12 +109,13 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
           ],
         ),
         actions: [
-          (widget.canalType=="privateCanals") ? IconButton(
-            icon: Icon(Icons.add),
+           IconButton(
+            icon: Icon(Icons.group),
             onPressed: () {
-              alert();
+              displayMembers(widget.teamId,widget.canalType,widget.canalId);
             },
-          ): Container(),
+          ),
+
         ],
       ),
       body: Padding(
@@ -112,76 +166,21 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
       ),
     );
   }
-  /*
-  alert(){
-    showCupertinoModalPopup(context: context, builder: (BuildContext context){
-      String userId = "";
-      bool isValidEmail = true; // Ajout de la variable pour suivre la validation
 
-      return AlertDialog(
-        actionsAlignment: MainAxisAlignment.start,
-        title: Text("Add user to this canal",
-          style: GoogleFonts.robotoCondensed(),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              decoration: InputDecoration(hintText: "userEmail"  ),
-              onChanged: (text) {
-                userId = text;
-                // Vérification de la validité de l'e-mail
-                final RegExp emailRegex = RegExp(
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                isValidEmail = emailRegex.hasMatch(userId);
-              },
-            ),
-            if (!isValidEmail)
-              const Text(
-                'Please enter a valid email address',
-                style: TextStyle(color: Colors.red),
-              ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: Text(
-              LocaleKeys.add.tr(),
-              style: GoogleFonts.robotoCondensed(),
-            ),
-            onPressed: () async {
-              if (isValidEmail) {
-                FirestoreMethods firestoreMethods = FirestoreMethods();
-                bool userInTeam = await firestoreMethods.isMemberOfTeam( widget.teamId, userId);
-                if(userInTeam){
-                  firestoreMethods.addMemberToCanal(widget.teamId, widget.canalId, userId);
-                }
-                else{
-                  const Text(
-                    'Memeber not exist in team!',
-                    style: TextStyle(color: Colors.red),
-                  );
-                }
 
-              }
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: Text(
-              LocaleKeys.cancel.tr(),
-              style: GoogleFonts.robotoCondensed(color: Colors.red),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    });
+
+  Future<Widget> buildProfileAvatar(String userId) async {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref("profile pictures/$userId");
+
+    // Récupérer l'URL de téléchargement de la photo de profil de l'utilisateur
+    final url = await ref.getDownloadURL();
+
+    return CircleAvatar(
+      backgroundImage: NetworkImage(url),
+      radius: 20,
+    );
   }
-
-   */
   void alert() {
     String userId = "";
     bool isValidEmail = true;
@@ -235,6 +234,7 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
+                    Navigator.of(context).pop();
                   } else {
                     Fluttertoast.showToast(
                       msg: "Member not exist in team!",
@@ -258,8 +258,6 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                     fontSize: 16.0,
                   );
                 }
-
-                Navigator.of(context).pop();
               },
             ),
             TextButton(
@@ -277,8 +275,87 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
     );
   }
 
+void displayMembers(String teamId,String canalType,String canalId){
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
 
+          return AlertDialog(
+            actionsAlignment: MainAxisAlignment.start,
+            title: Text(
+              "Canal's members",
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: allUsers.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    leading: FutureBuilder<Widget>(
+                      future: buildProfileAvatar(allUsers[index]["email"]),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return snapshot.data!;
+                        } else {
+                          return const CircleAvatar(
 
+                            backgroundImage: AssetImage("assets/images/avatar3.png"),
+                          );
+                        }
+                      },
+                    ),
+                    title: Text(
+                      allUsers[index]["nickname"],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      allUsers[index]["email"],
+                    ),
+
+                  );
+                },
+              ),
+            ),
+            actions: [
+              ( allUsers.length > 0 &&  allUsers[0]["email"] == currentUser.email ) ?
+
+              TextButton(
+                child: Text(
+                  LocaleKeys.add.tr(),
+                  style: GoogleFonts.robotoCondensed(),
+                ),
+                onPressed: () {
+                  alert();
+                },
+              ):TextButton(
+                child: Text("Ok",
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+
+              TextButton(
+                child: Text(
+                  LocaleKeys.cancel.tr(),
+                  style: GoogleFonts.robotoCondensed(color: Colors.red),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+
+        });
+
+  }
 
 
 }
+
+
