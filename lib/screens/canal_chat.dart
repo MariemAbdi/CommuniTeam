@@ -9,9 +9,10 @@ import '../resources/firestore_methods.dart';
 import '../services/Theme/custom_theme.dart';
 import '../translations/locale_keys.g.dart';
 import '../widgets/canalMessage_textfield.dart';
-import '../widgets/message_textfield.dart';
-import '../widgets/single_message.dart';
+
 import '../widgets/singlemessage_canal.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class CanalChatScreen extends StatefulWidget {
   final String teamId;
@@ -55,12 +56,12 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
           ],
         ),
         actions: [
-          IconButton(
+          (widget.canalType=="privateCanals") ? IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               alert();
             },
-          ),
+          ): Container(),
         ],
       ),
       body: Padding(
@@ -111,6 +112,7 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
       ),
     );
   }
+  /*
   alert(){
     showCupertinoModalPopup(context: context, builder: (BuildContext context){
       String userId = "";
@@ -178,5 +180,105 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
       );
     });
   }
+
+   */
+  void alert() {
+    String userId = "";
+    bool isValidEmail = true;
+    final RegExp emailRegex = RegExp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          actionsAlignment: MainAxisAlignment.start,
+          title: Text(
+            "Add user to this canal",
+            style: GoogleFonts.robotoCondensed(),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: InputDecoration(hintText: "userEmail"),
+                onChanged: (text) {
+                  userId = text;
+                  isValidEmail = emailRegex.hasMatch(userId);
+                },
+              ),
+              if (!isValidEmail)
+                const Text(
+                  'Please enter a valid email address',
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                LocaleKeys.add.tr(),
+                style: GoogleFonts.robotoCondensed(),
+              ),
+              onPressed: () async {
+                if (isValidEmail) {
+                  FirestoreMethods firestoreMethods = FirestoreMethods();
+                  bool userInTeam = await firestoreMethods.isMemberOfTeam(widget.teamId, userId);
+                  if (userInTeam) {
+                    await firestoreMethods.addMemberToCanal(widget.teamId, widget.canalId, userId);
+                    Fluttertoast.showToast(
+                      msg: "User added successfully",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Member not exist in team!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  }
+                }
+                else{
+                  Fluttertoast.showToast(
+                    msg: "Email not valid",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                }
+
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                LocaleKeys.cancel.tr(),
+                style: GoogleFonts.robotoCondensed(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 
 }
