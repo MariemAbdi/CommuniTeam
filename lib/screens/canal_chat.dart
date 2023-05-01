@@ -43,7 +43,7 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
 
       if (canalSnapshot.exists) {
         final List<dynamic> members = canalSnapshot.data()!['members'];
-
+        List<dynamic> tempUsers =[];
         for (int i = 0; i < members.length; i++) {
           var userId = members[i];
           var data = await FirebaseFirestore.instance
@@ -51,9 +51,10 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
               .doc(userId)
               .get();
 
-          allUsers.add(data);
+          tempUsers.add(data);
           setState(() {});
         }
+        allUsers=tempUsers;
       }
     } else {
       final canalSnapshot = await FirebaseFirestore.instance
@@ -63,17 +64,17 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
 
       if (canalSnapshot.exists) {
         final List<dynamic> members = canalSnapshot.data()!['members'];
-
+        List<dynamic> tempUsers =[];
         for (int i = 0; i < members.length; i++) {
           var userId = members[i];
           var data = await FirebaseFirestore.instance
               .collection("users")
               .doc(userId)
               .get();
-
-          allUsers.add(data);
+          tempUsers.add(data);
           setState(() {});
         }
+        allUsers=tempUsers;
       }
     }
   }
@@ -158,7 +159,6 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                       return const Center(child: CircularProgressIndicator());
                     })),
 
-
             CanalMessageTextField(teamId:widget.teamId,canalType:widget.canalType,canalId:widget.canalId)
 
           ],
@@ -220,9 +220,12 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                 style: GoogleFonts.robotoCondensed(),
               ),
               onPressed: () async {
+
                 if (isValidEmail) {
+                  //add member
                   FirestoreMethods firestoreMethods = FirestoreMethods();
                   bool userInTeam = await firestoreMethods.isMemberOfTeam(widget.teamId, userId);
+
                   if (userInTeam) {
                     await firestoreMethods.addMemberToCanal(widget.teamId, widget.canalId, userId);
                     Fluttertoast.showToast(
@@ -234,6 +237,8 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
+                    //actualiser state
+                    getCanalUsers(widget.teamId, widget.canalType,widget.canalId);
                     Navigator.of(context).pop();
                   } else {
                     Fluttertoast.showToast(
@@ -329,7 +334,9 @@ void displayMembers(String teamId,String canalType,String canalId){
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
+                  Navigator.pop(context);
                   alert();
+
                 },
               ):TextButton(
                 child: Text("Ok",
