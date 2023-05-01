@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../resources/firestore_methods.dart';
 import '../services/Theme/custom_theme.dart';
+import '../translations/locale_keys.g.dart';
 import '../widgets/canalMessage_textfield.dart';
 import '../widgets/message_textfield.dart';
 import '../widgets/single_message.dart';
@@ -49,6 +54,14 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
             )
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              alert();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -98,4 +111,72 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
       ),
     );
   }
+  alert(){
+    showCupertinoModalPopup(context: context, builder: (BuildContext context){
+      String userId = "";
+      bool isValidEmail = true; // Ajout de la variable pour suivre la validation
+
+      return AlertDialog(
+        actionsAlignment: MainAxisAlignment.start,
+        title: Text("Add user to this canal",
+          style: GoogleFonts.robotoCondensed(),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              decoration: InputDecoration(hintText: "userEmail"  ),
+              onChanged: (text) {
+                userId = text;
+                // Vérification de la validité de l'e-mail
+                final RegExp emailRegex = RegExp(
+                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                isValidEmail = emailRegex.hasMatch(userId);
+              },
+            ),
+            if (!isValidEmail)
+              const Text(
+                'Please enter a valid email address',
+                style: TextStyle(color: Colors.red),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text(
+              LocaleKeys.add.tr(),
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            onPressed: () async {
+              if (isValidEmail) {
+                FirestoreMethods firestoreMethods = FirestoreMethods();
+                bool userInTeam = await firestoreMethods.isMemberOfTeam( widget.teamId, userId);
+                if(userInTeam){
+                  firestoreMethods.addMemberToCanal(widget.teamId, widget.canalId, userId);
+                }
+                else{
+                  const Text(
+                    'Memeber not exist in team!',
+                    style: TextStyle(color: Colors.red),
+                  );
+                }
+
+              }
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text(
+              LocaleKeys.cancel.tr(),
+              style: GoogleFonts.robotoCondensed(color: Colors.red),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    });
+  }
+
 }

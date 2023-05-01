@@ -28,6 +28,26 @@ class FirestoreMethods{
     });
   }
 
+  addMemberToCanal(String teamId,String canalId,String userId){
+    teams.doc(teamId)
+        .collection("privateCanals")
+        .doc(canalId)
+        .update({
+       "members": FieldValue.arrayUnion([userId])
+    });
+  }
+
+
+  Future<bool> isMemberOfTeam(String teamId, String userId) async {
+    final documentSnapshot = await FirebaseFirestore.instance
+        .collection('teams')
+        .doc(teamId)
+        .get();
+
+    final List<dynamic> members = documentSnapshot.data()!['members'];
+
+    return members.contains(userId);
+  }
 
 
 
