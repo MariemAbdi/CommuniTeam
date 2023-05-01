@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../resources/firestore_methods.dart';
+import '../screens/canal_chat.dart';
+import '../screens/direct_chat.dart';
 import '../services/Theme/custom_theme.dart';
 import '../translations/locale_keys.g.dart';
 
@@ -11,6 +13,7 @@ class DrawerItemCanal extends StatefulWidget {
   final bool isOwner;
   final String collectionName;
   final String teamId;
+
   const DrawerItemCanal({Key? key, required this.canalId, required this.canalName, required this.collectionName, required this.isOwner, required this.teamId}) : super(key: key);
 
   @override
@@ -126,7 +129,12 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
       ),
 
       onTap: (){
-        Navigator.of(context).pushReplacementNamed('/home');
+
+
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CanalChatScreen( teamId:widget.teamId, canalType:widget.collectionName , canalId:widget.canalId, nickName: widget.canalName, )));
+
+
       },
     );
   }

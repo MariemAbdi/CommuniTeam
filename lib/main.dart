@@ -82,6 +82,7 @@ class _MyAppState extends State<MyApp> {
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         ProfileScreen.routeName: (context) => const ProfileScreen(),
         AddNewTeamScreen.routeName:(context)=>const AddNewTeamScreen(),
+
       },
     )
     );

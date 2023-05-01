@@ -187,6 +187,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                       return Visibility(
                                         visible: true,
                                           child: DrawerItemCanal(canalId: canals[index]['id'], canalName: canals[index]['name'], isOwner: user.email! == canals[index]["members"][0], collectionName: "privateCanals", teamId: selectedTeamId,));
+
                                     });
                               }
                               return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
