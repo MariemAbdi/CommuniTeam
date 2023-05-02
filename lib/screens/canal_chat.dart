@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/widgets/chat_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,7 +12,6 @@ import '../services/Theme/custom_theme.dart';
 import '../translations/locale_keys.g.dart';
 import '../widgets/canalMessage_textfield.dart';
 
-import '../widgets/singlemessage_canal.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 
@@ -84,7 +84,7 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
   void initState() {
     super.initState();
     getCanalUsers(widget.teamId, widget.canalType,widget.canalId);
-     currentUser = FirebaseAuth.instance.currentUser!;
+    currentUser = FirebaseAuth.instance.currentUser!;
   }
 
 
@@ -94,31 +94,6 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
     final user = FirebaseAuth.instance.currentUser!;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: CustomTheme.darkPurple,
-        title: Row(
-          children: [
-            //PROFILE PICTURE
-
-            const SizedBox(
-              width: 5,
-            ),
-            Text(
-              widget.nickName,
-              style: const TextStyle(fontSize: 20),
-            )
-          ],
-        ),
-        actions: [
-           IconButton(
-            icon: Icon(Icons.group),
-            onPressed: () {
-              displayMembers(widget.teamId,widget.canalType,widget.canalId);
-            },
-          ),
-
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -145,15 +120,17 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                             reverse: true,
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
-                              bool isMe = snapshot.data.docs[index]['senderId'] ==
-                                  user.email;
+                              bool isMe = snapshot.data.docs[index]['senderId'] == user.email;
                                  String senderId = snapshot.data.docs[index]['senderId'];
+                                 String message= snapshot.data.docs[index]['message'];
 
-                              return SingleCanalMessage(
-                                  message: snapshot.data.docs[index]['message'],
-                                  isMe: isMe,
-                                  senderId: senderId,
-                              );
+                                 return ChatItem(isMe: isMe, userId: senderId, message: message,);
+
+                              // return SingleCanalMessage(
+                              //     message: snapshot.data.docs[index]['message'],
+                              //     isMe: isMe,
+                              //     senderId: senderId,
+                              // );
                             });
                       }
                       return const Center(child: CircularProgressIndicator());
@@ -326,6 +303,7 @@ void displayMembers(String teamId,String canalType,String canalId){
               ),
             ),
             actions: [
+
               ( allUsers.length > 0 &&  allUsers[0]["email"] == currentUser.email ) ?
 
               TextButton(
@@ -361,7 +339,6 @@ void displayMembers(String teamId,String canalType,String canalId){
         });
 
   }
-
 
 }
 

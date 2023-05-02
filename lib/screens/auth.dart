@@ -16,11 +16,11 @@ class Auth extends StatelessWidget {
         builder: (context, snapshot){
           //USER IS LOGGED IN
           if(snapshot.hasData){
-            return const HomePage();
+            return HomePage(isCanal:true,title: "Channel Name",widget: Container(),);
+          }else{
+            return const LoginScreen();
           }
-          return const LoginScreen();
         },
-
       ),
     );
   }

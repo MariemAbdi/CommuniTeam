@@ -1,3 +1,4 @@
+import 'package:communiteam/screens/homepage.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -132,7 +133,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
 
 
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CanalChatScreen( teamId:widget.teamId, canalType:widget.collectionName , canalId:widget.canalId, nickName: widget.canalName, )));
+            builder: (context) => HomePage(isCanal: true,title: widget.canalName ,widget: CanalChatScreen( teamId:widget.teamId, canalType:widget.collectionName , canalId:widget.canalId, nickName: widget.canalName, ))));
 
 
       },

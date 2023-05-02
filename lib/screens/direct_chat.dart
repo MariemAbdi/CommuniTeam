@@ -41,22 +41,6 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
     final user = FirebaseAuth.instance.currentUser!;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: CustomTheme.darkPurple,
-        title: Row(
-          children: [
-            //PROFILE PICTURE
-            
-            const SizedBox(
-              width: 5,
-            ),
-            Text(
-              nickname,
-              style: const TextStyle(fontSize: 20),
-            )
-          ],
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
