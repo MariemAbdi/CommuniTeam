@@ -7,7 +7,6 @@ import 'package:communiteam/screens/homepage.dart';
 import 'package:communiteam/screens/profile.dart';
 import 'package:communiteam/screens/settings.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
-import 'package:communiteam/services/Theme/theme_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -76,13 +75,12 @@ class _MyAppState extends State<MyApp> {
       //FIRST SCREEN
       home: const Auth(),
       routes: {
+        HomePage.routeName: (context) => HomePage(isCanal:true,title: "Channel Name",widget: Container()),
         LoginScreen.routeName: (context) => const LoginScreen(),
         SignupScreen.routeName: (context) => const SignupScreen(),
-        HomePage.routeName: (context) => const HomePage(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
         ProfileScreen.routeName: (context) => const ProfileScreen(),
         AddNewTeamScreen.routeName:(context)=>const AddNewTeamScreen(),
-
       },
     )
     );

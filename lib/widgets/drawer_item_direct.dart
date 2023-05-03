@@ -1,4 +1,5 @@
 import 'package:communiteam/screens/direct_chat.dart';
+import 'package:communiteam/screens/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -62,7 +63,7 @@ class _DrawerItemDirectState extends State<DrawerItemDirect> {
 
       onTap: (){
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => DirectChatScreen(receiverId: widget.receiverId)));
+            builder: (context) => HomePage(isCanal: false, title: widget.name, widget: DirectChatScreen(receiverId: widget.receiverId))));
       },
 
     );
