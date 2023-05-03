@@ -10,7 +10,7 @@ class CustomTheme{
   static const  pink= Color(0xFFe01e5a);
   static const  white= Color(0xFFffffff);
   static const  black= Color(0xFF000000);
-
+  static const purplelight = Color(0xFFCE93D8);
 
   static final lightTheme = ThemeData.light().copyWith(
     primaryColor: darkPurple,

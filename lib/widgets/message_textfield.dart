@@ -64,7 +64,7 @@ class MessageTextFieldState extends State<MessageTextField> {
                   "date": DateTime.now(),
                }).then((value) {
                  FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).set({
-                     'last_msg':message,
+                     //'last_msg':message,
                  });
                });
 
@@ -77,7 +77,7 @@ class MessageTextFieldState extends State<MessageTextField> {
 
                }).then((value){
                  FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).set({
-                   "last_msg":message
+                   //"last_msg":message
                  });
                });
              },

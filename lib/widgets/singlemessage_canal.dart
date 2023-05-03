@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../services/Theme/custom_theme.dart';
+
 class SingleCanalMessage extends StatelessWidget {
   final String message;
   final bool isMe;
@@ -25,11 +27,12 @@ class SingleCanalMessage extends StatelessWidget {
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(maxWidth: 200),
+          padding: const EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
+          width: double.infinity,
+          //constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
-              color: isMe ? Colors.black : Colors.orange,
+              color: isMe ? CustomTheme.darkPurple : CustomTheme.purplelight,
               borderRadius: const BorderRadius.all(Radius.circular(12))
           ),
           child: FutureBuilder<String?>(
