@@ -2,13 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 
 class AddingAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
+  final String itemId;
 
-  const AddingAppbar({Key? key, required this.title}) : super(key: key);
+
+  const AddingAppbar({Key? key, required this.title,required this.itemId,}) : super(key: key);
 
   @override
   State<AddingAppbar> createState() => _AddingAppbarState();
@@ -18,37 +20,48 @@ class AddingAppbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AddingAppbarState extends State<AddingAppbar> {
+  List<bool> usersStatus = [];
+  List<dynamic> usersOutOfTeam = [];
 
+  getUsers(String teamId) async {
+    usersStatus = [];
+    usersOutOfTeam = [];
+    List<String> allUsersIds = [];
 
-  List<dynamic> allUsers =[];
+    var userDocs = await FirebaseFirestore.instance.collection("users").get();
+    for (var doc in userDocs.docs) {
+      // do something with the doc here
+      allUsersIds.add(doc.id);
+    }
 
-  getUsers() async {
     await FirebaseFirestore.instance
         .collection("teams")
-        .doc("toBCHluEdzfmeoXhCxQw")
+        .doc(teamId)
         .get()
         .then((value) async {
       // get users Ids
-      List<String> followersIds = List.from(value.data()!["members"]);
+      List<String> itemUsersIds = List.from(value.data()!["members"]);
 
       // loop through all ids and get associated user object by userID/followerID
-      for (int i = 0; i < followersIds.length; i++) {
-        var userId = followersIds[i];
-        var data = await FirebaseFirestore.instance
-            .collection("users")
-            .doc(userId)
-            .get();
-
-        allUsers.add(data);
+      for (int i = 0; i < allUsersIds.length; i++) {
+        var userId = allUsersIds[i];
+        if (!itemUsersIds.contains(userId)) {
+          var data = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .get();
+          usersOutOfTeam.add(data);
+          usersStatus.add(false);
+        }
       }
-      setState(() {
-      });
+      setState(() {});
     });
   }
+
   @override
   void initState() {
     super.initState();
-    getUsers();
+    getUsers("toBCHluEdzfmeoXhCxQw");
   }
 
   Future<Widget> buildProfileAvatar(String userId) async {
@@ -68,49 +81,57 @@ class _AddingAppbarState extends State<AddingAppbar> {
     showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) {
-
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
               "Add a teammate",
               style: GoogleFonts.robotoCondensed(),
             ),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: allUsers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    leading: FutureBuilder<Widget>(
-                      future: buildProfileAvatar(allUsers[index]["email"]),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return snapshot.data!;
-                        } else {
-                          return const CircleAvatar(
-
-                            backgroundImage: AssetImage("assets/images/avatar3.png"),
-                          );
-                        }
-                      },
-                    ),
-                    title: Text(
-                      allUsers[index]["nickname"],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      allUsers[index]["email"],
-                    ),
-                    trailing: Checkbox(
-                      value: false,
-                      onChanged: (bool? value) {},
-                    ),
-                  );
-                },
-              ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return SizedBox(
+                  width: double.maxFinite,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: usersOutOfTeam.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        leading: FutureBuilder<Widget>(
+                          future: buildProfileAvatar(
+                              usersOutOfTeam[index]["email"]),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return snapshot.data!;
+                            } else {
+                              return const CircleAvatar(
+                                backgroundImage:
+                                AssetImage("assets/images/avatar3.png"),
+                              );
+                            }
+                          },
+                        ),
+                        title: Text(
+                          usersOutOfTeam[index]["nickname"],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          usersOutOfTeam[index]["email"],
+                        ),
+                        trailing: Checkbox(
+                          value: usersStatus[index],
+                          onChanged: (bool? value) {
+                            setState(() {
+                              usersStatus[index] = value ?? false;
+                            });
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
             actions: [
               TextButton(
@@ -119,8 +140,9 @@ class _AddingAppbarState extends State<AddingAppbar> {
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
-                  // FirebaseAuth.instance.signOut();
-                  //  context.read<FirebaseAuthMethods>().signOut(context);
+                  addSelectedUsersToTeam();
+
+                  Navigator.of(context).pop();
                 },
               ),
               TextButton(
@@ -134,9 +156,60 @@ class _AddingAppbarState extends State<AddingAppbar> {
               ),
             ],
           );
-
         });
+  }
 
+  void addSelectedUsersToTeam() {
+    List<String> selectedUserIds = [];
+    // Loop through usersStatus and add selected user ids to selectedUserIds
+    for (int i = 0; i < usersStatus.length; i++) {
+      if (usersStatus[i]) {
+        selectedUserIds.add(usersOutOfTeam[i]["email"]);
+      }
+    }
+    if (selectedUserIds.length == 0) {
+      Fluttertoast.showToast(
+        msg: "Any User Selected!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      // Add selected users to team
+      FirebaseFirestore.instance
+          .collection("teams")
+          .doc("toBCHluEdzfmeoXhCxQw")
+          .update({"members": FieldValue.arrayUnion(selectedUserIds)}).then(
+              (value) {
+            // Clear selectedUserIds and usersStatus
+            selectedUserIds.clear();
+
+            Fluttertoast.showToast(
+              msg: "User added successfully",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+            //refrech list users
+            getUsers("toBCHluEdzfmeoXhCxQw");
+          }).catchError((onError) {
+        Fluttertoast.showToast(
+          msg: "Failed to Add Users, Try Again!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      });
+    }
   }
 
   @override
