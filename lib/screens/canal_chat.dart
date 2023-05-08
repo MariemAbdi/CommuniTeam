@@ -94,55 +94,68 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
     final user = FirebaseAuth.instance.currentUser!;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-                child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("teams")
-                        .doc(widget.teamId)
-                         .collection(widget.canalType)
-                         .doc(widget.canalId)
-                        .collection('messages')
-                        .orderBy("dateTime", descending: true)
-                        .snapshots(),
-                    builder: (context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data.docs.length < 1) {
-                          return const Center(
-                            child: Text("Say Hi"),
-                          );
+      body: Column(
+        children: [
+           Row(
+              children: [
+                const Spacer(),
+                Expanded(child: Container()), // Empty Expanded to fill available space
+                IconButton(
+                  onPressed: () {
+                    // action à effectuer lorsque l'IconButton est pressé
+                    displayMembers(widget.teamId,widget.canalType,widget.canalId);
+                  },
+                  icon: Icon(Icons.people),
+                ),
+              ],
+            ),
+
+          Expanded(
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("teams")
+                    .doc(widget.teamId)
+                    .collection(widget.canalType)
+                    .doc(widget.canalId)
+                    .collection('messages')
+                    .orderBy("dateTime", descending: true)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data.docs.length < 1) {
+                      return const Center(
+                        child: Text("Say Hi"),
+                      );
+                    }
+                    return ListView.builder(
+                        itemCount: snapshot.data.docs.length,
+                        reverse: true,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          bool isMe = snapshot.data.docs[index]['senderId'] == user.email;
+                          String senderId = snapshot.data.docs[index]['senderId'];
+                          String message= snapshot.data.docs[index]['message'];
+
+                          return ChatItem(isMe: isMe, userId: senderId, message: message,);
+
+                          // return SingleCanalMessage(
+                          //     message: snapshot.data.docs[index]['message'],
+                          //     isMe: isMe,
+                          //     senderId: senderId,
+                          // );
                         }
-                        return ListView.builder(
-                            itemCount: snapshot.data.docs.length,
-                            reverse: true,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              bool isMe = snapshot.data.docs[index]['senderId'] == user.email;
-                                 String senderId = snapshot.data.docs[index]['senderId'];
-                                 String message= snapshot.data.docs[index]['message'];
-
-                                 return ChatItem(isMe: isMe, userId: senderId, message: message,);
-
-                              // return SingleCanalMessage(
-                              //     message: snapshot.data.docs[index]['message'],
-                              //     isMe: isMe,
-                              //     senderId: senderId,
-                              // );
-                            });
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    })),
-
-            CanalMessageTextField(teamId:widget.teamId,canalType:widget.canalType,canalId:widget.canalId)
-
-          ],
-        ),
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                }
+            ),
+          ),
+          CanalMessageTextField(teamId:widget.teamId,canalType:widget.canalType,canalId:widget.canalId),
+        ],
       ),
     );
   }
+
 
 
 

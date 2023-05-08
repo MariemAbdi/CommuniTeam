@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    PreferredSizeWidget addingAppBar = AddingAppbar(title: widget.title,);
+    PreferredSizeWidget addingAppBar = AddingAppbar(title: widget.title, itemId: '',);
     PreferredSizeWidget customAppBar = CustomAppbar(title: widget.title,);
     return WillPopScope(
       onWillPop: () async => false,
