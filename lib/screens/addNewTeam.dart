@@ -1,4 +1,3 @@
-import 'package:communiteam/screens/settings.dart';
 import 'package:communiteam/widgets/drawer.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -192,7 +191,7 @@ class _AddNewTeamScreenState extends State<AddNewTeamScreen> {
   addTeam(String teamName,emails){
     if (teamName.isNotEmpty) {
       FirestoreMethods firestoreMethods = FirestoreMethods();
-      firestoreMethods.addTeam(teamName).then((teamId) {
+      firestoreMethods.addTeam(context,teamName,user.email!).then((teamId) {
         for (var email in emails) {
           firestoreMethods.addMemberToTeam(teamId, email);
         }

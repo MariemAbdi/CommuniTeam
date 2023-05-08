@@ -36,7 +36,7 @@ class FirebaseAuthMethods{
       user.updateDisplayName(nickname);
 
       //Create A New User & Add It To The Firestore Database
-      user_model.createUser(user_model.User(email: email,nickname:nickname), email);
+      user_model.createUser(user_model.User(email: email,nickname:nickname,bio: "Hello World!"), email);
 
       //ADD THE NEW USER TO THE GLOBAL TEAM CALLED ISET RADES
       FirestoreMethods firestoreMethods =FirestoreMethods();

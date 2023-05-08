@@ -13,7 +13,8 @@ import '../utils.dart';
 
 class ProfilePicture extends StatefulWidget {
   final String userId;
-  const ProfilePicture({Key? key, required this.userId}) : super(key: key);
+  final bool isMe;
+  const ProfilePicture({Key? key, required this.userId, required this.isMe}) : super(key: key);
 
   @override
   State<ProfilePicture> createState() => _ProfilePictureState();
@@ -21,25 +22,41 @@ class ProfilePicture extends StatefulWidget {
 
 class _ProfilePictureState extends State<ProfilePicture> {
   Storage storage = Storage();
+
   final user = FirebaseAuth.instance.currentUser!;
+
   Uint8List? image; // IF WE USE FILE TYPE INSTEAD THEN WE WON'T BE ABLE TO USE IT ON WEB
-  late String nickname="", bio="";
-  late String imageURL="";
+
+  late String nickname="", bio="", imageURL="";
+
+  late int randomId=3;
+
+  late TextEditingController alertController=TextEditingController();
+
 
   @override
   void initState() {
     super.initState();
     _fetchData(context);
+    setState(() {
+      randomId=Random().nextInt(5);
+    });
   }
 
+
+  @override
+  void dispose() {
+    alertController.dispose();
+    super.dispose();
+  }
   //GET THE USER'S DATA
   void _fetchData(BuildContext context) async{
     FirebaseFirestore.instance.collection("users").doc(widget.userId).get().then((DocumentSnapshot documentSnapshot) {
       setState(() {
         nickname=documentSnapshot["nickname"];
         bio=documentSnapshot["bio"];
-      });
-    }
+        });
+      }
     );
   }
 
@@ -93,6 +110,47 @@ class _ProfilePictureState extends State<ProfilePicture> {
     });
   }
 
+  Widget nameBio(String name, double fontSize, FontWeight fontWeight, VoidCallback function){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(name,style: GoogleFonts.robotoCondensed(textStyle: TextStyle(fontWeight: fontWeight, fontSize: fontSize),)),
+        Visibility(
+          visible: widget.isMe,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: function,
+            icon: const Icon(Icons.edit, color: Colors.white, size: 18,),
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<String?> openDialog(String title,IconData iconData,String hintText)=>
+      showDialog<String>(context: context, builder: (context)=> AlertDialog(
+    title: Text(title),
+    content: TextField(
+      autofocus: true,
+      controller: alertController,
+      decoration: InputDecoration(
+          prefixIcon: Icon(iconData),
+          hintText: hintText,
+      ),
+    ),
+    actions: [
+      TextButton(onPressed: (){
+        if(alertController.text.isNotEmpty){
+          Navigator.of(context).pop(alertController.text);
+          //alertController.clear();
+        }else{
+          customSnackBar(context, "This Field Can't Be Empty", Colors.red);
+        }
+      }, child: Text("Update",style: GoogleFonts.robotoCondensed(color: Colors.red),
+      ))
+    ],
+  ));
+
   @override
   Widget build(BuildContext context) {
     //CHECK IF THE CURRENT USER IS ACCESSING THEIR OWN PROFILE OR SOMEONE ELSE'S
@@ -116,12 +174,12 @@ class _ProfilePictureState extends State<ProfilePicture> {
                   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                     if(!snapshot.hasData){
                       return Container(
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                               color: CustomTheme.darkPurple,
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                 fit: BoxFit.cover,
-                                image: AssetImage("assets/images/avatar3.png"),
+                                image: AssetImage("assets/images/avatar$randomId.png"),//GENERATE RANDOM PROFILE PICTURE
                               )));
                     }
                     if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
@@ -162,8 +220,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
                       child: Container(
                         margin: const EdgeInsets.all(3.0),
                         padding: const EdgeInsets.all(8.0),
-                        decoration: const BoxDecoration(
-                          color: CustomTheme.darkPurple,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).brightness==CustomTheme.lightTheme.brightness ? CustomTheme.darkPurple: CustomTheme.darkTheme.primaryColorDark,
                           shape: BoxShape.circle,),
                         child: IconButton(
                           padding: EdgeInsets.zero,
@@ -182,11 +240,70 @@ class _ProfilePictureState extends State<ProfilePicture> {
 
         const SizedBox(height: 10,),
 
-        //THE USER'S USERNAME
-        Text(nickname,style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 30),)),
+        //--------------------THE USER'S USERNAME--------------------
+        nameBio(nickname,25,FontWeight.w600, () async {
+          setState(() {
+            alertController.text=nickname;
+          });
 
-        //THE USER'S BIO
-        Text(bio,style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),)),
+          //SHOW THE DIALOG ALERT AND GET THE RETURN
+          final newName = await openDialog("Update Nickname", Icons.person, "New Nickname");
+
+          //CHECK IF WHAT WE'VE GOT IS NULL OR EMPTY
+          if(newName==null || newName.isEmpty ){return;}
+
+          //ELSE
+          //UPDATE DISPLAY NAME
+          user.updateDisplayName(newName);
+
+          //UPDATE DOCUMENT IN FIRESTORE
+          FirebaseFirestore.instance.collection("users").doc(user.email).update(
+              {
+                "nickname": newName,
+              });
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+            // then execute the navigation code.
+            customSnackBar(context, "Nickname Updated Successfully!", Colors.green);
+          });
+
+          //REFRESH DATA ON SCREEN
+          setState(() {_fetchData(context);});
+        }),
+
+
+        //--------------------------THE USER'S BIO--------------------------
+        nameBio(bio,20, FontWeight.w300, () async {
+
+          setState(() {
+            alertController.text=bio;
+          });
+
+          //SHOW THE DIALOG ALERT AND GET THE RETURN
+          final newBio = await openDialog("Update Bio", Icons.abc, "New Bio");
+
+          //CHECK IF WHAT WE'VE GOT IS NULL OR EMPTY
+          if(newBio==null || newBio.isEmpty ){return;}
+
+          //ELSE
+          //UPDATE DOCUMENT IN FIRESTORE
+          FirebaseFirestore.instance.collection("users").doc(user.email).update(
+              {
+                "bio": newBio,
+              });
+
+          //POP LOADING CIRCLE
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+            // then execute the navigation code.
+            customSnackBar(context, "Bio Updated Successfully!", Colors.green);
+          });
+
+          //REFRESH DATA ON SCREEN
+          setState(() {_fetchData(context);});
+        }),
+
       ],
     );
   }

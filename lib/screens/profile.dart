@@ -33,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               children: [
 
-                ProfilePicture(userId: user.email!,),
+                ProfilePicture(userId: user.email!, isMe: true,),
 
               ],
             ),

@@ -24,15 +24,21 @@ class _CanalMessageTextFieldState extends State<CanalMessageTextField> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsetsDirectional.all(8),
+      color: Theme.of(context).scaffoldBackgroundColor,
+      padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          Expanded(child: Theme(
-            data: CustomTheme.lightTheme,
-            child: TextFormField(
+          Expanded(
+              child: Theme(
+              data: CustomTheme.lightTheme,
+              child: TextFormField(
               controller: _controller,
               decoration: InputDecoration(
                   labelText:"Type Your Message",
@@ -56,7 +62,7 @@ class _CanalMessageTextFieldState extends State<CanalMessageTextField> {
               ),
             ),
           )),
-          const SizedBox(width: 20,),
+          const SizedBox(width: 10,),
           GestureDetector(
             onTap: ()async{
               String message = _controller.text;
@@ -80,10 +86,10 @@ class _CanalMessageTextFieldState extends State<CanalMessageTextField> {
               });
             },
             child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: CustomTheme.darkPurple,
+                color: Theme.of(context).brightness==CustomTheme.lightTheme.brightness ? CustomTheme.darkPurple: CustomTheme.darkTheme.primaryColorDark,
               ),
               child: const Icon(Icons.send,color: Colors.white,),
             ),

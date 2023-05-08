@@ -7,16 +7,20 @@ class FirestoreMethods{
   CollectionReference teams = FirebaseFirestore.instance.collection('teams');
 
   //CREATE NEW TEAM
-  Future<String> addTeam(String teamName) {
+  Future<String> addTeam(BuildContext context, String teamName, String owner) {
     // Call the CollectionReference to add a new document
     return teams.add({
       'name': teamName,
-      'members': [],
+      'members': [owner],
+      'defaultCanal': ""
     }).then((value) {
       // Update the id
       teams.doc(value.id).update({
         "id": value.id
       });
+
+      addCanal(context, value.id, "General", false, owner);
+
       return value.id; // Return the new team ID
     });
   }
@@ -79,6 +83,11 @@ class FirestoreMethods{
           "id": value.id
         });
 
+        //Update the TEAM'S DEFAULT CANAL
+        teams.doc(teamID).update({
+          "defaultCanal": value.id
+        });
+
         customSnackBar(context, "Canal Created Successfully!", Colors.green);
       });
     }else if(!docPrivateSnapshot.exists && isPrivate) {
@@ -90,6 +99,11 @@ class FirestoreMethods{
         //update the id
         privateCanal.doc(value.id).update({
           "id": value.id
+        });
+
+        //Update the TEAM'S DEFAULT CANAL
+        teams.doc(teamID).update({
+        "defaultCanal": value.id
         });
 
         customSnackBar(context, "Canal Created Successfully!", Colors.green);

@@ -72,7 +72,7 @@ class CustomTheme{
         errorStyle: GoogleFonts.robotoCondensed(),
         focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.grey),),
         errorBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.red),),
-        iconColor: darkPurple,
+        iconColor: white,
         prefixStyle: const TextStyle(fontSize: 15)
     ),
   );

@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +27,10 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+
+  GetStorage getStorage = GetStorage();
+
+
   final user = FirebaseAuth.instance.currentUser!;
   String dropdownValue ="Iset Rades";
   List<Team> teams = [];
@@ -48,11 +53,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         Team team = Team(
             id: value['id'],
             name: value['name'],
+            defaultCanal: value['defaultCanal'],
             members: value['members'].cast<String>());
           list.add(team);
       }
       setState(() {
-
         teams = list;
       });
     });
@@ -63,6 +68,36 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void initState() {
     super.initState();
     getTeams();
+
+    //GET THE LAST VISITED TEAM
+    if(getStorage.read("selectedTeamId")!=null){
+      setState(() {
+        selectedTeamId=getStorage.read("selectedTeamId");
+      });
+    }
+    if(getStorage.read("selectedTeamName")!=null){
+      setState(() {
+        dropdownValue=getStorage.read("selectedTeamName");
+      });
+    }
+
+    //-------------SETTING IF THE CANALS/USERS LIST ARE SHOWING OR HIDDEN------------------
+    if(getStorage.read("publicCanals")!=null){
+      setState(() {
+        publicCanals=getStorage.read("publicCanals");
+      });
+    }
+    if(getStorage.read("privateCanals")!=null){
+      setState(() {
+        privateCanals=getStorage.read("privateCanals");
+      });
+    }
+    if(getStorage.read("directMessages")!=null){
+      setState(() {
+        directMessages=getStorage.read("directMessages");
+      });
+    }
+
     //id of team isetRades
     getUsers("toBCHluEdzfmeoXhCxQw");
    // getUsers("em1D9YKBKIHRAwCB64UB");
@@ -126,7 +161,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           //GO TO ADD TEAM Screen
                             Navigator.pop(context);
                             Navigator.of(context).pushReplacementNamed('/add_new_team');
-
                       }),
 
                     teamDropDown(),
@@ -136,6 +170,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     canalRow(Icons.public,LocaleKeys.publicCanals.tr(),publicCanals, (){
                       setState(() {
                         publicCanals=!publicCanals;
+                        getStorage.write("publicCanals", publicCanals);
                       });
                     },false),
 
@@ -170,6 +205,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     canalRow(Icons.lock,LocaleKeys.privateCanals.tr(),privateCanals, (){
                       setState(() {
                         privateCanals=!privateCanals;
+                        getStorage.write("privateCanals", privateCanals);
                       });
                     },true),
 
@@ -207,6 +243,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     canalRow(Icons.message, LocaleKeys.directMessages.tr(), directMessages, () {
                       setState(() {
                         directMessages=!directMessages;
+                        getStorage.write("directMessages", directMessages);
                       });
                     }, false),
 
@@ -457,6 +494,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             onTap: () {
               setState(() {
                 selectedTeamId = value.id;
+                getStorage.write("selectedTeamId", selectedTeamId);
               });
             },
           );
@@ -465,6 +503,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         onChanged: (String? newValue) async {
           setState(() {
             dropdownValue = newValue!;
+            getStorage.write("selectedTeamName", dropdownValue);
           });
         });
   }
@@ -479,6 +518,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       onTap: function,
     );
   }
+
+
   Future<Widget> buildProfileAvatar(String userId) async {
     final storage = FirebaseStorage.instance;
     final ref = storage.ref("profile pictures/$userId");
@@ -491,6 +532,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       radius: 20,
     );
   }
+
+
   void addSelectedUsersToTeam(String teamID) {
     List<String> selectedUserIds = [];
     // Loop through usersStatus and add selected user ids to selectedUserIds
@@ -499,7 +542,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         selectedUserIds.add(usersOutOfTeam[i]["email"]);
       }
     }
-    if (selectedUserIds.length == 0) {
+    if (selectedUserIds.isEmpty) {
       Fluttertoast.showToast(
         msg: "Any User Selected!",
         toastLength: Toast.LENGTH_SHORT,
@@ -543,6 +586,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
     }
   }
+
+
   List<bool> usersStatus = [];
   List<dynamic> usersOutOfTeam = [];
 
@@ -664,9 +709,4 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         });
 
   }
-
-
-
-
-
 }

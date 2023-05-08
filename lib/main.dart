@@ -7,12 +7,14 @@ import 'package:communiteam/screens/homepage.dart';
 import 'package:communiteam/screens/profile.dart';
 import 'package:communiteam/screens/settings.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
+import 'package:communiteam/services/Theme/theme_service.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/sign_in.dart';
@@ -26,7 +28,10 @@ Future<void> main() async{
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp,DeviceOrientation.portraitDown]);
 
   //MAKE THE APP FULL SCREEN => HIDES THE STATUS AND NAVIGATION BAR OF THE PHONE
-// SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: []);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: []);
+
+  //INITIALIZE THE GET STORAGE USED TO SAVE PREFERENCES
+  await GetStorage.init();
 
   //INITIALIZE THE LOCALIZATION
   await EasyLocalization.ensureInitialized();
@@ -67,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       //APP THEME CONFIGURATION
       theme: CustomTheme.lightTheme,
       darkTheme: CustomTheme.darkTheme,
-      themeMode: ThemeMode.system,//ThemeService().theme,
+      themeMode: ThemeService().theme,//ThemeMode.system,//
       //LOCALIZATION CONFIGURATION
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
