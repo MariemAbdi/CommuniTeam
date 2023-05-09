@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/services/firebase_storage_services.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,7 @@ import '../resources/firestore_methods.dart';
 import '../translations/locale_keys.g.dart';
 import 'drawer_item_canal.dart';
 import 'drawer_item_direct.dart';
+import 'email_field.dart';
 
 
 class DrawerWidget extends StatefulWidget {
@@ -36,12 +38,19 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   List<Team> teams = [];
   Storage storage = Storage();
 
+  TextEditingController memberController = TextEditingController();
+  TextEditingController teamController = TextEditingController();
+  List<String> emailList = [];
+
   late String selectedTeamId = "toBCHluEdzfmeoXhCxQw";
 
   bool publicCanals=false;
   bool privateCanals=false;
   bool directMessages=false;
   bool isMember= false;
+
+  List<bool> usersStatus = [];
+  List<dynamic> usersOutOfTeam = [];
 
   getTeams() async {
     await FirebaseFirestore.instance
@@ -80,7 +89,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         dropdownValue=getStorage.read("selectedTeamName");
       });
     }
-
     //-------------SETTING IF THE CANALS/USERS LIST ARE SHOWING OR HIDDEN------------------
     if(getStorage.read("publicCanals")!=null){
       setState(() {
@@ -97,10 +105,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         directMessages=getStorage.read("directMessages");
       });
     }
-
-    //id of team isetRades
+    //get users of team isetRades
     getUsers("toBCHluEdzfmeoXhCxQw");
-   // getUsers("em1D9YKBKIHRAwCB64UB");
+    emailList.add(user.email!);
   }
 
   @override
@@ -159,8 +166,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                     teamRow(Icons.group, LocaleKeys.team.tr(), () {
                           //GO TO ADD TEAM Screen
-                            Navigator.pop(context);
-                            Navigator.of(context).pushReplacementNamed('/add_new_team');
+                      addTeamDialog();
+                            //Navigator.pop(context);
+                           // Navigator.of(context).pushReplacementNamed('/add_new_team');
                       }),
 
                     teamDropDown(),
@@ -519,7 +527,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-
   Future<Widget> buildProfileAvatar(String userId) async {
     final storage = FirebaseStorage.instance;
     final ref = storage.ref("profile pictures/$userId");
@@ -532,7 +539,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       radius: 20,
     );
   }
-
 
   void addSelectedUsersToTeam(String teamID) {
     List<String> selectedUserIds = [];
@@ -586,10 +592,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
     }
   }
-
-
-  List<bool> usersStatus = [];
-  List<dynamic> usersOutOfTeam = [];
 
   getUsers(String teamId) async {
     usersStatus = [];
@@ -709,4 +711,287 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         });
 
   }
+
+  addTeamDialog(){
+
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            actionsAlignment: MainAxisAlignment.spaceEvenly,
+            title: Text(
+              "Add a new Team",
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return SizedBox(
+                  width: double.maxFinite,
+                  child:SingleChildScrollView(
+                    child: SizedBox(
+
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              validator: (name) {
+                                if (name!.isEmpty) {
+                                  return "Team's name can't be empty";
+                                }
+                                return null;
+                              },
+                              controller: teamController,
+                              keyboardType: TextInputType.name,
+                              decoration: InputDecoration(
+                                  labelText: "team Name",
+                                  hintText: "Team Name",
+                                  prefixIcon: const Icon(CupertinoIcons.group_solid),
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: teamController.text.isEmpty
+                                      ? null
+                                      : IconButton(
+                                    icon: const Icon(EvaIcons.close),
+                                    onPressed: () {
+                                      setState(() {
+                                        teamController.clear();
+                                      });
+                                    },
+                                  )),
+                              onChanged: (value) {
+                                setState(() {});
+                              },
+
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    addUserToNewTeam();
+
+                                  },
+                                  icon: const Icon(Icons.add),
+                                  label: const Text('User'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Expanded(
+                              child: _buildEmailList(),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            actions: [
+              TextButton(
+                child: Text(
+                  LocaleKeys.add.tr(),
+                  style: GoogleFonts.robotoCondensed(),
+                ),
+                onPressed: () {
+                  addNewTeam( teamController.text.trim(),emailList);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  LocaleKeys.cancel.tr(),
+                  style: GoogleFonts.robotoCondensed(color: Colors.red),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+   }
+
+  Widget _buildEmailList() {
+    return Builder(
+      builder: (BuildContext context) {
+        return ListView.separated(
+          shrinkWrap: true,
+          itemCount: emailList.length - 1,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: Icon(Icons.email),
+              title: Text(emailList[index + 1]),
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    emailList.removeAt(index + 1);
+                  });
+                },
+              ),
+            );
+          },
+          separatorBuilder: (context, index) {
+            return Divider();
+          },
+        );
+      },
+    );
+  }
+
+
+  addUserToNewTeam() {
+
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+
+          title: Text("Add User ${teamController.text.trim()}"),
+
+          content:StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return EmailField(emailController: memberController);
+
+          }
+          ),
+
+
+          actions: [
+            TextButton(
+              child: Text(LocaleKeys.cancel.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+
+            TextButton(
+              child: Text(LocaleKeys.add.tr()),
+              onPressed: () {
+                String newEmail = memberController.text.trim();
+                if (isValidEmail(newEmail) &&
+                    !isEmailExist(newEmail, emailList)) {
+                  setState(() {
+                    emailList.insert(1, newEmail);
+                  });
+                  Fluttertoast.showToast(
+                    msg: "Email added to the list!",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.green,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                  memberController.clear();
+                  Navigator.of(context).pop();
+                }
+                else{
+                  if(!isValidEmail(newEmail)){
+                    Fluttertoast.showToast(
+                      msg: "Invalid Email!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  }
+                  else{
+                    Fluttertoast.showToast(
+                      msg: "Email already exist in the list!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  }
+                }
+
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+  bool isValidEmail(String email) {
+    RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegExp.hasMatch(email);
+  }
+
+  bool isEmailExist(String email, List<String> list) {
+    return list.contains(email);
+  }
+
+  addNewTeam(String teamName,emails){
+    if (teamName.isNotEmpty) {
+      FirestoreMethods firestoreMethods = FirestoreMethods();
+      firestoreMethods.addTeam(context,teamName,user.email!).then((teamId) {
+        for (var email in emails) {
+           firestoreMethods.addMemberToTeam(teamId, email);
+        }
+
+        //emailList.clear();
+
+        setState(() {
+          teamController.clear();
+          emailList=[user.email!];
+        });
+        Fluttertoast.showToast(
+          msg: "Team added successefull!",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
+        Navigator.of(context).pop();
+      })
+      .catchError((onError){
+        Fluttertoast.showToast(
+          msg: "Error when adding team!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      });
+
+    }
+    else{
+
+      Fluttertoast.showToast(
+        msg: "Team's name can't be empty!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+
+    }
+
+
+  }
+
 }

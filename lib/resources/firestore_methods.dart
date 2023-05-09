@@ -88,7 +88,7 @@ class FirestoreMethods{
           "defaultCanal": value.id
         });
 
-        customSnackBar(context, "Canal Created Successfully!", Colors.green);
+        customSnackBar(context, "Canal $canalName Created Successfully!", Colors.greenAccent);
       });
     }else if(!docPrivateSnapshot.exists && isPrivate) {
       //IF PRIVATE
