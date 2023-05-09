@@ -72,6 +72,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     });
   }
 
+  bool isGeneral(List<Team> teams,String teamId,String canalId){
+    bool result = false;
+    int i=0;
+    while(!result && i<teams.length){
+      Team currentTeam = teams[i];
+      result = ( (currentTeam.id ==teamId) && (currentTeam.defaultCanal==canalId) ) ;
+        i++;
+    }
+    return result;
+  }
 
   @override
   void initState() {
@@ -192,13 +202,15 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             builder: (context, AsyncSnapshot snapshot){
                               if(snapshot.hasData){
                                 final canals = snapshot.data!.docs;
+
                                 return ListView.builder(
                                     itemCount: canals.length,
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
                                     physics: const ClampingScrollPhysics(),
                                     itemBuilder: (BuildContext context, int index){
-                                      return DrawerItemCanal(canalId:canals[index]["id"], canalName: canals[index]['name'], isOwner: user.email == canals[index]['owner'], collectionName: 'publicCanals', teamId: selectedTeamId,);
+                                      return DrawerItemCanal(canalId:canals[index]["id"], canalName: canals[index]['name'], isOwner: user.email == canals[index]['owner'], collectionName: 'publicCanals', teamId: selectedTeamId,
+                                      isGeneral: isGeneral(teams,selectedTeamId, canals[index]["id"]) );
                                     });
                               }
                               return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
@@ -235,7 +247,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                     itemBuilder: (BuildContext context, int index){
                                       return Visibility(
                                         visible: true,
-                                          child: DrawerItemCanal(canalId: canals[index]['id'], canalName: canals[index]['name'], isOwner: user.email! == canals[index]["members"][0], collectionName: "privateCanals", teamId: selectedTeamId,));
+                                          child: DrawerItemCanal(canalId: canals[index]['id'], canalName: canals[index]['name'], isOwner: user.email! == canals[index]["members"][0], collectionName: "privateCanals", teamId: selectedTeamId,
+                                          isGeneral: false));
 
                                     });
                               }
@@ -414,10 +427,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     LocaleKeys.add.tr(),
                     style: GoogleFonts.robotoCondensed(),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (canalName.isNotEmpty) {
                       FirestoreMethods firestoreMethods = FirestoreMethods();
                       firestoreMethods.addCanal(context, selectedTeamId, canalName, isPrivate, user.email!);
+                      await getTeams();
                     }
                     Navigator.of(context).pop();
                   },
@@ -945,9 +959,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         for (var email in emails) {
            firestoreMethods.addMemberToTeam(teamId, email);
         }
-
         //emailList.clear();
-
         setState(() {
           teamController.clear();
           emailList=[user.email!];
@@ -961,7 +973,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-
         Navigator.of(context).pop();
       })
       .catchError((onError){

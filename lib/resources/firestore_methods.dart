@@ -19,10 +19,11 @@ class FirestoreMethods{
         "id": value.id
       });
 
-      addCanal(context, value.id, "General", false, owner);
 
+      addGeneralCanal(context,value.id, owner);
       return value.id; // Return the new team ID
     });
+
   }
 
 
@@ -82,11 +83,13 @@ class FirestoreMethods{
         publicCanal.doc(value.id).update({
           "id": value.id
         });
-
+/*
         //Update the TEAM'S DEFAULT CANAL
         teams.doc(teamID).update({
           "defaultCanal": value.id
         });
+
+ */
 
         customSnackBar(context, "Canal $canalName Created Successfully!", Colors.greenAccent);
       });
@@ -100,17 +103,40 @@ class FirestoreMethods{
         privateCanal.doc(value.id).update({
           "id": value.id
         });
-
+/*
         //Update the TEAM'S DEFAULT CANAL
         teams.doc(teamID).update({
         "defaultCanal": value.id
         });
+
+ */
 
         customSnackBar(context, "Canal Created Successfully!", Colors.green);
       });
     }else{
       customSnackBar(context, "Canal With This Name Exists Already!", Colors.red);
     }
+  }
+
+  //CREATE NEW CHANNEL
+  Future<void> addGeneralCanal(BuildContext context, String teamID, String owner) async {
+    CollectionReference publicCanal = teams.doc(teamID).collection("publicCanals");
+
+      await publicCanal.add({
+        'name': "General",
+        'owner': owner,
+      }).then((value) {
+        //update the id
+        publicCanal.doc(value.id).update({
+          "id": value.id
+        });
+
+        //Update the TEAM'S DEFAULT CANAL
+        teams.doc(teamID).update({
+          "defaultCanal": value.id
+        });
+      });
+
   }
 
   //DELETE CHANNEL

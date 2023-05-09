@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../resources/firestore_methods.dart';
 import '../screens/canal_chat.dart';
-import '../screens/direct_chat.dart';
+
 import '../services/Theme/custom_theme.dart';
 import '../translations/locale_keys.g.dart';
 
@@ -14,8 +14,12 @@ class DrawerItemCanal extends StatefulWidget {
   final bool isOwner;
   final String collectionName;
   final String teamId;
+  final bool isGeneral;
 
-  const DrawerItemCanal({Key? key, required this.canalId, required this.canalName, required this.collectionName, required this.isOwner, required this.teamId}) : super(key: key);
+
+
+  const DrawerItemCanal({Key? key, required this.canalId, required this.canalName,
+    required this.collectionName, required this.isOwner, required this.teamId, required this.isGeneral}) : super(key: key);
 
   @override
   State<DrawerItemCanal> createState() => _DrawerItemCanalState();
@@ -26,7 +30,8 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
 
   void deleteCanal() {
     FirestoreMethods firestoreMethods= FirestoreMethods();
-    firestoreMethods.deleteCanal(context,widget.teamId,widget.collectionName, widget.canalId);}
+    firestoreMethods.deleteCanal(context,widget.teamId,widget.collectionName, widget.canalId);
+  }
 
   void editCanal() {
   FirestoreMethods firestoreMethods= FirestoreMethods();
@@ -60,6 +65,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            //Edit
             IconButton(
               onPressed: () {
                 showDialog(
@@ -96,6 +102,8 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
               },
               icon: const Icon(Icons.edit, color: CustomTheme.green, size: 20,),
             ),
+            //Delete
+            if (!widget.isGeneral)
             IconButton(
               onPressed: () {
                 showDialog(
@@ -140,3 +148,4 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
     );
   }
 }
+
