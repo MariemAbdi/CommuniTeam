@@ -1054,7 +1054,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
 
                 Navigator.of(context).pop(); // Fermer la boîte de dialogue
-                setState(() {}); // Mettre à jour l'état pour fermer la liste déroulante
+                setState(() {});
+                Navigator.pop(context);// Mettre à jour l'état pour fermer la liste déroulante
               },
             ),
 
