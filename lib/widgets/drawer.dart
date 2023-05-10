@@ -118,6 +118,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     //get users of team isetRades
     getUsers("toBCHluEdzfmeoXhCxQw");
     emailList.add(user.email!);
+
   }
 
   @override
@@ -496,6 +497,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   style: GoogleFonts.robotoCondensed(),
                   maxLines: 1,
                 )),
+                if( (value.id != "toBCHluEdzfmeoXhCxQw") && (value.members[0] == user.email!) )
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -504,8 +506,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         addingTeammate(value.id);
                       },
                       icon: const Icon(
-                        Icons.add_reaction_outlined,
+                        Icons.add_road_sharp,
                         color: CustomTheme.white,
+                        size: 20,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        deleteTeam(value.id,value.name);
+                      },
+                      icon: const Icon(
+                        Icons.delete_forever,
+                        color: Colors.red,
                         size: 20,
                       ),
                     ),
@@ -862,8 +874,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
 
   addUserToNewTeam() {
-
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -955,7 +965,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   addNewTeam(String teamName,emails){
     if (teamName.isNotEmpty) {
       FirestoreMethods firestoreMethods = FirestoreMethods();
-      firestoreMethods.addTeam(context,teamName,user.email!).then((teamId) {
+      firestoreMethods.addTeam(context,teamName,user.email!).then((teamId) async {
         for (var email in emails) {
            firestoreMethods.addMemberToTeam(teamId, email);
         }
@@ -973,6 +983,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+        //
+        await getTeams();
         Navigator.of(context).pop();
       })
       .catchError((onError){
@@ -1004,5 +1016,43 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
 
   }
+  deleteTeam(teamId,teamName){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
 
+          title: Text("Are you sure to delete '$teamName' ?"),
+
+          actions: [
+            TextButton(
+              child: Text(LocaleKeys.cancel.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+
+            TextButton(
+              child: Text(LocaleKeys.yes.tr()),
+              onPressed: ()  {
+                FirestoreMethods firestoreMethods = FirestoreMethods();
+                firestoreMethods.deleteTeam(context,teamId);
+                getTeams();
+                if(selectedTeamId == teamId){
+                  setState( () {
+                    selectedTeamId = "toBCHluEdzfmeoXhCxQw";
+                    getStorage.write("selectedTeamId", selectedTeamId);
+                    dropdownValue = "Iset Rades";
+                    getStorage.write("selectedTeamName", dropdownValue);
+                  });
+                }
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -6,7 +6,7 @@ class FirestoreMethods{
   // Create a CollectionReference called users that references the firestore collection
   CollectionReference teams = FirebaseFirestore.instance.collection('teams');
 
-  //CREATE NEW TEAM
+  //CREATE TEAM
   Future<String> addTeam(BuildContext context, String teamName, String owner) {
     // Call the CollectionReference to add a new document
     return teams.add({
@@ -147,6 +147,15 @@ class FirestoreMethods{
         .doc(canalId)
         .delete()
         .then((value) => customSnackBar(context, "Canal Successfully Deleted!", Colors.green))
+        .catchError((error) => debugPrint("ERROR: $error"));
+  }
+
+  //DELETE CHANNEL
+  Future<void> deleteTeam(BuildContext context,String teamID) {
+    // Call the  CollectionReference to delete the document
+    return teams.doc(teamID)
+        .delete()
+        .then((value) => customSnackBar(context, "Team Successfully Deleted!", Colors.green))
         .catchError((error) => debugPrint("ERROR: $error"));
   }
 
