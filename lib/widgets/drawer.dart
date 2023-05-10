@@ -31,8 +31,6 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
 
   GetStorage getStorage = GetStorage();
-
-
   final user = FirebaseAuth.instance.currentUser!;
   String dropdownValue ="Iset Rades";
   List<Team> teams = [];
@@ -72,7 +70,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     });
   }
 
-  bool isGeneral(List<Team> teams,String teamId,String canalId){
+  bool isGeneralCanal(List<Team> teams,String teamId,String canalId){
     bool result = false;
     int i=0;
     while(!result && i<teams.length){
@@ -211,7 +209,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                     physics: const ClampingScrollPhysics(),
                                     itemBuilder: (BuildContext context, int index){
                                       return DrawerItemCanal(canalId:canals[index]["id"], canalName: canals[index]['name'], isOwner: user.email == canals[index]['owner'], collectionName: 'publicCanals', teamId: selectedTeamId,
-                                      isGeneral: isGeneral(teams,selectedTeamId, canals[index]["id"]) );
+                                      isGeneral: isGeneralCanal(teams,selectedTeamId, canals[index]["id"]) );
                                     });
                               }
                               return const Center(child: CircularProgressIndicator(color: CustomTheme.darkPurple,),);
@@ -280,8 +278,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                       if(snapshot.hasData){
                                         DocumentSnapshot item = snapshot.data!;
                                         List<String> members = item['members'].cast<String>();
+
                                         //REMOVE THE CURRENT USER
                                         members.removeWhere((element) => element==user.email!);
+                                        //members.sort(true);
                                         return ListView.builder(
                                             itemCount: members.length,
                                             scrollDirection: Axis.vertical,
@@ -472,32 +472,35 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   //TEAM DROPDOWN WIDGET
-  Widget teamDropDown(){
+  Widget teamDropDown() {
+
     return DropdownButton<String>(
-        value: dropdownValue,
-        style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 19,
-            overflow: TextOverflow.ellipsis),
-        isExpanded: true,
-        icon: const Icon(Icons.keyboard_arrow_down,
-            color: Colors.white),
-        iconSize: 20,
-        dropdownColor: Colors.grey,
-        borderRadius: BorderRadius.circular(12),
-        underline: Container(),
-        items: teams.map<DropdownMenuItem<String>>((Team value) {
-          return DropdownMenuItem<String>(
-            value: value.name,
-            child: Row(
-              children: [
-                Expanded(child:Text(
+      value: dropdownValue,
+      style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 19,
+          overflow: TextOverflow.ellipsis),
+      isExpanded: true,
+      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
+      iconSize: 20,
+      dropdownColor: Colors.grey,
+      borderRadius: BorderRadius.circular(12),
+      underline: Container(),
+      items: teams.map<DropdownMenuItem<String>>((Team value) {
+        return DropdownMenuItem<String>(
+          value: value.name,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
                   value.name,
                   style: GoogleFonts.robotoCondensed(),
                   maxLines: 1,
-                )),
-                if( (value.id != "toBCHluEdzfmeoXhCxQw") && (value.members[0] == user.email!) )
+                ),
+              ),
+              if ((value.id != "toBCHluEdzfmeoXhCxQw") &&
+                  (value.members[0] == user.email!))
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -513,7 +516,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     ),
                     IconButton(
                       onPressed: () {
-                        deleteTeam(value.id,value.name);
+                        deleteTeam(value.id, value.name);
                       },
                       icon: const Icon(
                         Icons.delete_forever,
@@ -523,23 +526,23 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     ),
                   ],
                 ),
-              ],
-            ),
-            onTap: () {
-              setState(() {
-                selectedTeamId = value.id;
-                getStorage.write("selectedTeamId", selectedTeamId);
-              });
-            },
-          );
-
-        }).toList(),
-        onChanged: (String? newValue) async {
-          setState(() {
-            dropdownValue = newValue!;
-            getStorage.write("selectedTeamName", dropdownValue);
-          });
+            ],
+          ),
+          onTap: () {
+            setState(() {
+              selectedTeamId = value.id;
+              getStorage.write("selectedTeamId", selectedTeamId);
+            });
+          },
+        );
+      }).toList(),
+      onChanged: (String? newValue) async {
+        setState(() {
+          dropdownValue = newValue!;
+          getStorage.write("selectedTeamName", dropdownValue);
         });
+      },
+    );
   }
 
   //CUSTOM LIST TILE
@@ -984,8 +987,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           fontSize: 16.0,
         );
         //
-        await getTeams();
         Navigator.of(context).pop();
+        await getTeams();
       })
       .catchError((onError){
         Fluttertoast.showToast(
@@ -1038,6 +1041,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 FirestoreMethods firestoreMethods = FirestoreMethods();
                 firestoreMethods.deleteTeam(context,teamId);
                 getTeams();
+                //si le team supprimé est le team selectionné , on selectionne iset rades
                 if(selectedTeamId == teamId){
                   setState( () {
                     selectedTeamId = "toBCHluEdzfmeoXhCxQw";
@@ -1047,9 +1051,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   });
                 }
 
-                Navigator.of(context).pop();
+
+
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue
+                setState(() {}); // Mettre à jour l'état pour fermer la liste déroulante
               },
             ),
+
           ],
         );
       },
