@@ -140,6 +140,7 @@ class FirestoreMethods{
   }
 
   //DELETE CHANNEL
+  /*
   Future<void> deleteCanal(BuildContext context,String teamID,String collectionName,String canalId) {
     // Call the  CollectionReference to delete the document
     return teams.doc(teamID)
@@ -149,14 +150,84 @@ class FirestoreMethods{
         .then((value) => customSnackBar(context, "Canal Successfully Deleted!", Colors.green))
         .catchError((error) => debugPrint("ERROR: $error"));
   }
+*/
 
   //DELETE CHANNEL
+  Future<void> deleteCanal(BuildContext context, String teamID,String collectionName, String canalID) async {
+    try {
+
+      // Supprimer les messages du canal
+      QuerySnapshot messagesSnapshot = await teams.doc(teamID)
+          .collection(collectionName)
+          .doc(canalID)
+          .collection("messages")
+          .get();
+
+      for (QueryDocumentSnapshot message in messagesSnapshot.docs) {
+        await message.reference.delete();
+      }
+
+
+      await teams.doc(teamID).collection(collectionName).doc(canalID).delete();
+
+      customSnackBar(context, "Canal Successfully Deleted!", Colors.green);
+    } catch (error) {
+      debugPrint("ERROR: $error");
+    }
+  }
+
+
+  //DELETE CHANNEL
+  /*
   Future<void> deleteTeam(BuildContext context,String teamID) {
     // Call the  CollectionReference to delete the document
     return teams.doc(teamID)
         .delete()
         .then((value) => customSnackBar(context, "Team Successfully Deleted!", Colors.green))
         .catchError((error) => debugPrint("ERROR: $error"));
+  }
+
+   */
+  //DELETE TEAM
+  Future<void> deleteTeam(BuildContext context, String teamID) async {
+    try {
+
+      await teams.doc(teamID).delete();
+
+      QuerySnapshot privateCanalsSnapshot = await teams.doc(teamID).collection("privateCanals").get();
+      for (QueryDocumentSnapshot canal in privateCanalsSnapshot.docs) {
+
+        // Supprimer les messages du canal privé
+        QuerySnapshot messagesSnapshot = await canal.reference.collection("messages").get();
+        for (QueryDocumentSnapshot message in messagesSnapshot.docs) {
+          await message.reference.delete();
+        }
+
+        // Supprimer le canal privé
+        await canal.reference.delete();
+      }
+
+      // Supprimer les canaux publics
+      QuerySnapshot publicCanalsSnapshot =
+      await teams.doc(teamID).collection("publicCanals").get();
+      for (QueryDocumentSnapshot canal in publicCanalsSnapshot.docs) {
+        String canalId = canal.id;
+
+        // Supprimer les messages du canal public
+        QuerySnapshot messagesSnapshot = await canal.reference.collection("messages").get();
+        for (QueryDocumentSnapshot message in messagesSnapshot.docs) {
+          await message.reference.delete();
+        }
+
+        // Supprimer le canal public
+        await canal.reference.delete();
+      }
+
+      // Afficher un message de succès
+      customSnackBar(context, "Team Successfully Deleted!", Colors.green);
+    } catch (error) {
+      debugPrint("ERROR: $error");
+    }
   }
 
 

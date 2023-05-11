@@ -67,6 +67,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       setState(() {
         teams = list;
       });
+
     });
   }
 
@@ -84,6 +85,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   void initState() {
     super.initState();
+
     getTeams();
 
     //GET THE LAST VISITED TEAM
@@ -113,7 +115,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         directMessages=getStorage.read("directMessages");
       });
     }
-    //get users of team isetRades
+    //get users of team iset Rades
     getUsers("toBCHluEdzfmeoXhCxQw");
     emailList.add(user.email!);
 
@@ -989,19 +991,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         //
         Navigator.of(context).pop();
         await getTeams();
-      })
-      .catchError((onError){
-        Fluttertoast.showToast(
-          msg: "Error when adding team!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
       });
-
     }
     else{
 
@@ -1040,7 +1030,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               onPressed: ()  {
                 FirestoreMethods firestoreMethods = FirestoreMethods();
                 firestoreMethods.deleteTeam(context,teamId);
-                getTeams();
+                //getTeams();
                 //si le team supprimé est le team selectionné , on selectionne iset rades
                 if(selectedTeamId == teamId){
                   setState( () {
