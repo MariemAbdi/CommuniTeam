@@ -32,7 +32,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   GetStorage getStorage = GetStorage();
   final user = FirebaseAuth.instance.currentUser!;
-  String dropdownValue ="Iset Rades";
+  String dropdownValue ="General Team";
   List<Team> teams = [];
   Storage storage = Storage();
 
@@ -88,6 +88,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
     getTeams();
 
+
     //GET THE LAST VISITED TEAM
     if(getStorage.read("selectedTeamId")!=null){
       setState(() {
@@ -115,7 +116,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         directMessages=getStorage.read("directMessages");
       });
     }
-    //get users of team iset Rades
+    //get users of team General Team
     getUsers("toBCHluEdzfmeoXhCxQw");
     emailList.add(user.email!);
 
@@ -434,9 +435,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     if (canalName.isNotEmpty) {
                       FirestoreMethods firestoreMethods = FirestoreMethods();
                       firestoreMethods.addCanal(context, selectedTeamId, canalName, isPrivate, user.email!);
+                    //  Navigator.pop(context);
                       await getTeams();
+                      /*Navigator.pop(context);
+                      Navigator.of(context).pop();*/
                     }
-                    Navigator.of(context).pop();
+                   /* Navigator.pop(context);
+                    Navigator.of(context).pop();*/
                   },
                 ),
                 TextButton(
@@ -1031,12 +1036,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 FirestoreMethods firestoreMethods = FirestoreMethods();
                 firestoreMethods.deleteTeam(context,teamId);
                 //getTeams();
-                //si le team supprimé est le team selectionné , on selectionne iset rades
+                //si le team supprimé est le team selectionné , on selectionne General Team
                 if(selectedTeamId == teamId){
                   setState( () {
                     selectedTeamId = "toBCHluEdzfmeoXhCxQw";
                     getStorage.write("selectedTeamId", selectedTeamId);
-                    dropdownValue = "Iset Rades";
+                    dropdownValue = "General Team";
                     getStorage.write("selectedTeamName", dropdownValue);
                   });
                 }

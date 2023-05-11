@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/utils.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/canal_chat.dart';
+import '../screens/homepage.dart';
+
 class FirestoreMethods{
   // Create a CollectionReference called users that references the firestore collection
   CollectionReference teams = FirebaseFirestore.instance.collection('teams');
@@ -90,7 +93,10 @@ class FirestoreMethods{
         });
 
  */
-
+        //Navigator.pop(context);
+        //Navigator.of(context).pop();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals" , canalId:value.id, nickName: canalName, ))));
         customSnackBar(context, "Canal $canalName Created Successfully!", Colors.greenAccent);
       });
     }else if(!docPrivateSnapshot.exists && isPrivate) {
@@ -110,6 +116,10 @@ class FirestoreMethods{
         });
 
  */
+       // Navigator.pop(context);
+      //  Navigator.of(context).pop();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"privateCanals" , canalId:value.id, nickName: canalName, ))));
 
         customSnackBar(context, "Canal Created Successfully!", Colors.green);
       });
