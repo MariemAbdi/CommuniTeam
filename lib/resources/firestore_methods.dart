@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
 import 'package:communiteam/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/canal_chat.dart';
@@ -21,14 +23,33 @@ class FirestoreMethods{
       teams.doc(value.id).update({
         "id": value.id
       });
-
-
-      addGeneralCanal(context,value.id, owner);
+      addCanal(context, value.id, "General", false, owner);
+      //addGeneralCanal(context,value.id, owner);
       return value.id; // Return the new team ID
     });
 
   }
 
+  // //CREATE NEW CHANNEL
+  // Future<void> addGeneralCanal(BuildContext context, String teamID, String owner) async {
+  //   CollectionReference publicCanal = teams.doc(teamID).collection("publicCanals");
+  //
+  //     await publicCanal.add({
+  //       'name': "General",
+  //       'owner': owner,
+  //     }).then((value) {
+  //       //update the id
+  //       publicCanal.doc(value.id).update({
+  //         "id": value.id
+  //       });
+  //
+  //       //Update the TEAM'S DEFAULT CANAL
+  //       teams.doc(teamID).update({
+  //         "defaultCanal": value.id
+  //       });
+  //     });
+  //
+  // }
 
   addMemberToTeam(String teamId,String userId ){
     teams.doc(teamId).update({
@@ -86,18 +107,20 @@ class FirestoreMethods{
         publicCanal.doc(value.id).update({
           "id": value.id
         });
-/*
-        //Update the TEAM'S DEFAULT CANAL
-        teams.doc(teamID).update({
-          "defaultCanal": value.id
-        });
 
- */
+        // Update the TEAM'S DEFAULT CANAL
+        // teams.doc(teamID).update({
+        //   "defaultCanal": value.id
+        // });
+
+
         //Navigator.pop(context);
         //Navigator.of(context).pop();
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals" , canalId:value.id, nickName: canalName, ))));
-        customSnackBar(context, "Canal $canalName Created Successfully!", Colors.greenAccent);
+
+
+        //GOING TO THE NEW TEAM'S SCREEN
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals" , canalId:value.id, nickName: canalName, ))));
+        customSnackBar(context, LocaleKeys.canalCreatedSuccessfully.tr(), Colors.green);
       });
     }else if(!docPrivateSnapshot.exists && isPrivate) {
       //IF PRIVATE
@@ -121,33 +144,37 @@ class FirestoreMethods{
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"privateCanals" , canalId:value.id, nickName: canalName, ))));
 
-        customSnackBar(context, "Canal Created Successfully!", Colors.green);
+        customSnackBar(context, LocaleKeys.canalCreatedSuccessfully.tr(), Colors.green);
       });
     }else{
-      customSnackBar(context, "Canal With This Name Exists Already!", Colors.red);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+        // then execute the navigation code.
+        customSnackBar(context, LocaleKeys.canalExistsAlready.tr(), Colors.red);
+      });
     }
   }
 
-  //CREATE NEW CHANNEL
-  Future<void> addGeneralCanal(BuildContext context, String teamID, String owner) async {
-    CollectionReference publicCanal = teams.doc(teamID).collection("publicCanals");
-
-      await publicCanal.add({
-        'name': "General",
-        'owner': owner,
-      }).then((value) {
-        //update the id
-        publicCanal.doc(value.id).update({
-          "id": value.id
-        });
-
-        //Update the TEAM'S DEFAULT CANAL
-        teams.doc(teamID).update({
-          "defaultCanal": value.id
-        });
-      });
-
-  }
+  // //CREATE NEW CHANNEL
+  // Future<void> addGeneralCanal(BuildContext context, String teamID, String owner) async {
+  //   CollectionReference publicCanal = teams.doc(teamID).collection("publicCanals");
+  //
+  //     await publicCanal.add({
+  //       'name': "General",
+  //       'owner': owner,
+  //     }).then((value) {
+  //       //update the id
+  //       publicCanal.doc(value.id).update({
+  //         "id": value.id
+  //       });
+  //
+  //       //Update the TEAM'S DEFAULT CANAL
+  //       teams.doc(teamID).update({
+  //         "defaultCanal": value.id
+  //       });
+  //     });
+  //
+  // }
 
   //DELETE CHANNEL
   /*
@@ -180,7 +207,11 @@ class FirestoreMethods{
 
       await teams.doc(teamID).collection(collectionName).doc(canalID).delete();
 
-      customSnackBar(context, "Canal Successfully Deleted!", Colors.green);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+        // then execute the navigation code.
+        customSnackBar(context, LocaleKeys.canalSuccessfullyDeleted.tr(), Colors.red);
+      });
     } catch (error) {
       debugPrint("ERROR: $error");
     }
@@ -206,7 +237,6 @@ class FirestoreMethods{
 
       QuerySnapshot privateCanalsSnapshot = await teams.doc(teamID).collection("privateCanals").get();
       for (QueryDocumentSnapshot canal in privateCanalsSnapshot.docs) {
-
         // Supprimer les messages du canal privé
         QuerySnapshot messagesSnapshot = await canal.reference.collection("messages").get();
         for (QueryDocumentSnapshot message in messagesSnapshot.docs) {
@@ -234,7 +264,6 @@ class FirestoreMethods{
       }
 
       // Afficher un message de succès
-      customSnackBar(context, "Team Successfully Deleted!", Colors.green);
     } catch (error) {
       debugPrint("ERROR: $error");
     }
@@ -244,7 +273,7 @@ class FirestoreMethods{
   Future<void> editCanal(BuildContext context,String teamId, String channelId,String collectionName,String newName) async{
     DocumentReference channelDoc = teams.doc(teamId).collection(collectionName).doc(channelId);
 
-    return channelDoc.update({'name': newName}).then((value) => customSnackBar(context, "Canal Was Modified Successfully!", Colors.green))
+    return channelDoc.update({'name': newName}).then((value) => customSnackBar(context, LocaleKeys.canalRenamedSuccessfully.tr(), Colors.green))
         .catchError((error) => debugPrint('Error when updating name: $error'));
   }
 }

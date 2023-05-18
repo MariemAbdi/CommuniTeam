@@ -72,7 +72,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: const Text("Edit Canal"),
+                      title: Text(LocaleKeys.renameCanal.tr()),
                       content: TextFormField(
                         controller: _textEditingController,
                         onChanged: (text) {
@@ -87,7 +87,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
                           },
                         ),
                         TextButton(
-                          child: const Text("Edit"),
+                          child: Text(LocaleKeys.rename.tr()),
                           onPressed: () {
                             if(_textEditingController.text.trim().isNotEmpty){
                               editCanal();
@@ -111,7 +111,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text(LocaleKeys.yes.tr()),
-                      content: Text("Are You Sure You Want To Delete ${widget.canalName}?"),
+                      content: Text(LocaleKeys.areYouSureYouWantToDeleteTeam.tr()),
                       actions: [
                         TextButton(
                           child: Text(LocaleKeys.cancel.tr()),
@@ -120,7 +120,7 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
                           },
                         ),
                         TextButton(
-                          child: const Text("Delete"),
+                          child: Text(LocaleKeys.delete.tr()),
                           onPressed: () {
                             deleteCanal();
                             Navigator.of(context).pop();
@@ -138,8 +138,6 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
       ),
 
       onTap: (){
-
-
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => HomePage(isCanal: true,title: widget.canalName ,widget: CanalChatScreen( teamId:widget.teamId, canalType:widget.collectionName , canalId:widget.canalId, nickName: widget.canalName, ))));
 

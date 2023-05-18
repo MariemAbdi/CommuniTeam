@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/screens/profile.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:communiteam/services/firebase_storage_services.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -15,10 +18,12 @@ import 'package:provider/provider.dart';
 import '../models/team.dart';
 import '../providers/firebase_auth_methods.dart';
 import '../resources/firestore_methods.dart';
+import '../screens/canal_chat.dart';
+import '../screens/homepage.dart';
 import '../translations/locale_keys.g.dart';
+import '../utils.dart';
 import 'drawer_item_canal.dart';
 import 'drawer_item_direct.dart';
-import 'email_field.dart';
 
 
 class DrawerWidget extends StatefulWidget {
@@ -39,6 +44,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   TextEditingController memberController = TextEditingController();
   TextEditingController teamController = TextEditingController();
   List<String> emailList = [];
+  late int randomId=3;
+
 
   late String selectedTeamId = "toBCHluEdzfmeoXhCxQw";
 
@@ -50,6 +57,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   List<bool> usersStatus = [];
   List<dynamic> usersOutOfTeam = [];
 
+  //GET ALL THE TEAMS THAT THE CURRENT USER IS A MEMBER IN
   getTeams() async {
     await FirebaseFirestore.instance
         .collection("teams").where("members", arrayContains: user.email!)
@@ -86,15 +94,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void initState() {
     super.initState();
 
+    //FILL THE LIST OF TEAMS
     getTeams();
 
-
-    //GET THE LAST VISITED TEAM
+    //GET THE LAST VISITED TEAM ID
     if(getStorage.read("selectedTeamId")!=null){
       setState(() {
         selectedTeamId=getStorage.read("selectedTeamId");
       });
     }
+    //GET THE LAST VISITED TEAM NAME
     if(getStorage.read("selectedTeamName")!=null){
       setState(() {
         dropdownValue=getStorage.read("selectedTeamName");
@@ -116,6 +125,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         directMessages=getStorage.read("directMessages");
       });
     }
+
+    //USED TO RANDOMLY SELECT AN AVATAR IF USER DOESN'T HAVE A PROFILE PICTURE
+    setState(() {
+      randomId=Random().nextInt(5);
+    });
+
+
     //get users of team General Team
     getUsers("toBCHluEdzfmeoXhCxQw");
     emailList.add(user.email!);
@@ -178,9 +194,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                     teamRow(Icons.group, LocaleKeys.team.tr(), () {
                           //GO TO ADD TEAM Screen
-                      addTeamDialog();
-                            //Navigator.pop(context);
-                           // Navigator.of(context).pushReplacementNamed('/add_new_team');
+                          addTeamDialog();
                       }),
 
                     teamDropDown(),
@@ -270,6 +284,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       });
                     }, false),
 
+
                     Visibility(
                                 visible: directMessages,
                                 child: SizedBox(height: MediaQuery.of(context).size.height*0.2,
@@ -284,7 +299,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
                                         //REMOVE THE CURRENT USER
                                         members.removeWhere((element) => element==user.email!);
-                                        //members.sort(true);
+
                                         return ListView.builder(
                                             itemCount: members.length,
                                             scrollDirection: Axis.vertical,
@@ -325,7 +340,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           //GO TO PROFILE
                           bottomListTile(LocaleKeys.myProfile.tr(), Icons.account_circle, () {
                             Navigator.pop(context);
-                            Navigator.of(context).pushReplacementNamed('/profile');
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfileScreen(isMe: true, userId: user.email!)));
                           }),
 
                           //GO TO SETTINGS
@@ -346,7 +361,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                   style:
                                   GoogleFonts.robotoCondensed(),
                                 ),
-                                content: const Text("Would you like to logout?"),
+                                content: Text(LocaleKeys.areYouSureYouWantToLogout.tr()),
                                 actions: [
                                   TextButton(
                                     child: Text(
@@ -355,6 +370,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                                           .robotoCondensed(),
                                     ),
                                     onPressed: () {
+                                      getStorage.erase();
                                       context.read<FirebaseAuthMethods>().signOut(context);
                                     },
                                   ),
@@ -435,10 +451,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                     if (canalName.isNotEmpty) {
                       FirestoreMethods firestoreMethods = FirestoreMethods();
                       firestoreMethods.addCanal(context, selectedTeamId, canalName, isPrivate, user.email!);
-                    //  Navigator.pop(context);
-                      await getTeams();
-                      /*Navigator.pop(context);
-                      Navigator.of(context).pop();*/
+                      // Navigator.pop(context);
+                      //
+                      // await getTeams();
+                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     }
                    /* Navigator.pop(context);
                     Navigator.of(context).pop();*/
@@ -480,7 +497,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   //TEAM DROPDOWN WIDGET
   Widget teamDropDown() {
-
     return DropdownButton<String>(
       value: dropdownValue,
       style: const TextStyle(
@@ -509,19 +525,24 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               if ((value.id != "toBCHluEdzfmeoXhCxQw") &&
                   (value.members[0] == user.email!))
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
+                      constraints: BoxConstraints.tight(const Size.fromWidth(30)),
+                      padding: const EdgeInsets.all(0),
                       onPressed: () {
                         addingTeammate(value.id);
                       },
                       icon: const Icon(
-                        Icons.add_road_sharp,
+                        Icons.person_add,
                         color: CustomTheme.white,
                         size: 20,
                       ),
                     ),
                     IconButton(
+                      constraints: BoxConstraints.tight(const Size.fromWidth(30)),
+                      padding: EdgeInsets.zero,
                       onPressed: () {
                         deleteTeam(value.id, value.name);
                       },
@@ -563,6 +584,128 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
+  //ALERT DIALOG TO ADD A NEW TEAM
+  addTeamDialog(){
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            actionsAlignment: MainAxisAlignment.start,
+            title: Text(
+              LocaleKeys.addNewTeam.tr(),
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            content: TextFormField(
+              validator: (name) {
+                if (name!.isEmpty) {
+                  return LocaleKeys.teamNameCantBeEmpty.tr();
+                }
+                return null;
+              },
+              controller: teamController,
+              keyboardType: TextInputType.name,
+              decoration: InputDecoration(
+                  labelText: LocaleKeys.teamName.tr(),
+                  hintText: LocaleKeys.teamName.tr(),
+                  prefixIcon: const Icon(CupertinoIcons.group_solid),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: teamController.text.isEmpty
+                      ? null
+                      : IconButton(
+                    icon: const Icon(EvaIcons.close),
+                    onPressed: () {
+                      setState(() {
+                        teamController.clear();
+                      });
+                    },
+                  )),
+              onChanged: (value) {
+                setState(() {});
+              },
+
+            ),
+            actions: [
+              TextButton(
+                child: Text(
+                  LocaleKeys.add.tr(),
+                  style: GoogleFonts.robotoCondensed(),
+                ),
+                onPressed: () {
+                  FirestoreMethods firestoreMethods = FirestoreMethods();
+                  firestoreMethods.addTeam(context,teamController.text.trim(),user.email!);
+
+                  customSnackBar(context, LocaleKeys.teamAddedSuccessully.tr(), Colors.green);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  LocaleKeys.cancel.tr(),
+                  style: GoogleFonts.robotoCondensed(color: Colors.red),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  //ALERT DIALOG TO DELETE A TEAM
+  deleteTeam(teamId,teamName){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+
+          title: Text(LocaleKeys.areYouSureYouWantToDeleteTeam.tr()),
+
+          actions: [
+            TextButton(
+              child: Text(LocaleKeys.cancel.tr()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+
+            TextButton(
+              child: Text(LocaleKeys.yes.tr()),
+              onPressed: ()  {
+                FirestoreMethods firestoreMethods = FirestoreMethods();
+                firestoreMethods.deleteTeam(context,teamId);
+                //si le team supprimé est le team selectionné , on selectionne General Team
+                if(selectedTeamId == teamId){
+                  setState( () {
+                    selectedTeamId = "toBCHluEdzfmeoXhCxQw";
+                    getStorage.write("selectedTeamId", selectedTeamId);
+                    dropdownValue = "General Team";
+                    getStorage.write("selectedTeamName", dropdownValue);
+                  });
+
+                  Navigator.of(context).pop(); // Fermer la boîte de dialogue
+                  Navigator.pop(context);// Mettre à jour l'état pour fermer la liste déroulante
+
+                  //GOING TO THE DEFAULT TEAM'S SCREEN
+                  Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const HomePage(isCanal: true, title: "General Team" ,widget: CanalChatScreen( teamId: "toBCHluEdzfmeoXhCxQw", canalType: "publicCanals" , canalId: "lTfMN0DfWD4SvUvmfgHZ", nickName: "General", ))
+                  ));
+                }
+
+                customSnackBar(context, LocaleKeys.teamDeletedSuccessfully.tr(), Colors.red);
+
+                Navigator.of(context).pop(); // Fermer la boîte de dialogue
+                Navigator.pop(context);// Mettre à jour l'état pour fermer la liste déroulante
+              },
+            ),
+
+          ],
+        );
+      },
+    );
+  }
+
+  //AVATAR WIDGET
   Future<Widget> buildProfileAvatar(String userId) async {
     final storage = FirebaseStorage.instance;
     final ref = storage.ref("profile pictures/$userId");
@@ -576,94 +719,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
-  void addSelectedUsersToTeam(String teamID) {
-    List<String> selectedUserIds = [];
-    // Loop through usersStatus and add selected user ids to selectedUserIds
-    for (int i = 0; i < usersStatus.length; i++) {
-      if (usersStatus[i]) {
-        selectedUserIds.add(usersOutOfTeam[i]["email"]);
-      }
-    }
-    if (selectedUserIds.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Any User Selected!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    } else {
-      // Add selected users to team
-      FirebaseFirestore.instance
-          .collection("teams")
-          .doc(teamID)
-          .update({"members": FieldValue.arrayUnion(selectedUserIds)}).then(
-              (value) {
-            // Clear selectedUserIds and usersStatus
-            selectedUserIds.clear();
-
-            Fluttertoast.showToast(
-              msg: "User added successfully",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-            //refrech list users
-            getUsers(teamID);
-          }).catchError((onError) {
-        Fluttertoast.showToast(
-          msg: "Failed to Add Users, Try Again!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      });
-    }
-  }
-
-  getUsers(String teamId) async {
-    usersStatus = [];
-    usersOutOfTeam = [];
-    List<String> allUsersIds = [];
-
-    var userDocs = await FirebaseFirestore.instance.collection("users").get();
-    for (var doc in userDocs.docs) {
-      // do something with the doc here
-      allUsersIds.add(doc.id);
-    }
-
-    await FirebaseFirestore.instance
-        .collection("teams")
-        .doc(teamId)
-        .get()
-        .then((value) async {
-      // get users Ids
-      List<String> teamUsersIds = List.from(value.data()!["members"]);
-
-      // loop through all ids and get associated user object by userID/followerID
-      for (int i = 0; i < allUsersIds.length; i++) {
-        var userId = allUsersIds[i];
-        if (!teamUsersIds.contains(userId)) {
-          var data = await FirebaseFirestore.instance
-              .collection("users")
-              .doc(userId)
-              .get();
-          usersOutOfTeam.add(data);
-          usersStatus.add(false);
-        }
-      }
-      setState(() {});
-    });
-  }
-
+  //ALERT DIALOG TO ADD A NEW TEAM MEMBER
   Future<void> addingTeammate(String teamID) async {
     await getUsers(teamID);
     showCupertinoModalPopup(
@@ -672,7 +728,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
-              "Add a teammate",
+              LocaleKeys.addTeamMember.tr(),
               style: GoogleFonts.robotoCondensed(),
             ),
             content: StatefulBuilder(
@@ -691,9 +747,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             if (snapshot.hasData) {
                               return snapshot.data!;
                             } else {
-                              return const CircleAvatar(
+                              return CircleAvatar(
                                 backgroundImage:
-                                AssetImage("assets/images/avatar3.png"),
+                                AssetImage("assets/images/avatar$randomId.png"),
                               );
                             }
                           },
@@ -724,120 +780,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             actions: [
               TextButton(
                 child: Text(
-                  "Add",
+                  LocaleKeys.add.tr(),
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
                   addSelectedUsersToTeam(teamID);
 
                   Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text(
-                  "Cancel",
-                  style: GoogleFonts.robotoCondensed(color: Colors.red),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-
-  }
-
-  addTeamDialog(){
-
-    showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            actionsAlignment: MainAxisAlignment.spaceEvenly,
-            title: Text(
-              "Add a new Team",
-              style: GoogleFonts.robotoCondensed(),
-            ),
-            content: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return SizedBox(
-                  width: double.maxFinite,
-                  child:SingleChildScrollView(
-                    child: SizedBox(
-
-                      height: MediaQuery.of(context).size.height * 0.4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            const SizedBox(height: 8),
-                            TextFormField(
-                              validator: (name) {
-                                if (name!.isEmpty) {
-                                  return "Team's name can't be empty";
-                                }
-                                return null;
-                              },
-                              controller: teamController,
-                              keyboardType: TextInputType.name,
-                              decoration: InputDecoration(
-                                  labelText: "team Name",
-                                  hintText: "Team Name",
-                                  prefixIcon: const Icon(CupertinoIcons.group_solid),
-                                  border: const OutlineInputBorder(),
-                                  suffixIcon: teamController.text.isEmpty
-                                      ? null
-                                      : IconButton(
-                                    icon: const Icon(EvaIcons.close),
-                                    onPressed: () {
-                                      setState(() {
-                                        teamController.clear();
-                                      });
-                                    },
-                                  )),
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    addUserToNewTeam();
-
-                                  },
-                                  icon: const Icon(Icons.add),
-                                  label: const Text('User'),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: _buildEmailList(),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-            actions: [
-              TextButton(
-                child: Text(
-                  LocaleKeys.add.tr(),
-                  style: GoogleFonts.robotoCondensed(),
-                ),
-                onPressed: () {
-                  addNewTeam( teamController.text.trim(),emailList);
                 },
               ),
               TextButton(
@@ -852,211 +801,73 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ],
           );
         });
-   }
 
-  Widget _buildEmailList() {
-    return Builder(
-      builder: (BuildContext context) {
-        return ListView.separated(
-          shrinkWrap: true,
-          itemCount: emailList.length - 1,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: Icon(Icons.email),
-              title: Text(emailList[index + 1]),
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  setState(() {
-                    emailList.removeAt(index + 1);
-                  });
-                },
-              ),
-            );
-          },
-          separatorBuilder: (context, index) {
-            return Divider();
-          },
-        );
-      },
-    );
   }
 
 
-  addUserToNewTeam() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+  void addSelectedUsersToTeam(String teamID) {
+    List<String> selectedUserIds = [];
+    // Loop through usersStatus and add selected user ids to selectedUserIds
+    for (int i = 0; i < usersStatus.length; i++) {
+      if (usersStatus[i]) {
+        selectedUserIds.add(usersOutOfTeam[i]["email"]);
+      }
+    }
+    if (selectedUserIds.isEmpty) {
+      customSnackBar(context, LocaleKeys.noUserSelected.tr(), Colors.red);
+    } else {
+      // Add selected users to team
+      FirebaseFirestore.instance
+          .collection("teams")
+          .doc(teamID)
+          .update({"members": FieldValue.arrayUnion(selectedUserIds)}).then(
+              (value) {
+            // Clear selectedUserIds and usersStatus
+            selectedUserIds.clear();
 
-          title: Text("Add User ${teamController.text.trim()}"),
+            customSnackBar(context, LocaleKeys.memberAddedSuccessfully, Colors.green);
 
-          content:StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return EmailField(emailController: memberController);
-
-          }
-          ),
-
-
-          actions: [
-            TextButton(
-              child: Text(LocaleKeys.cancel.tr()),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-
-            TextButton(
-              child: Text(LocaleKeys.add.tr()),
-              onPressed: () {
-                String newEmail = memberController.text.trim();
-                if (isValidEmail(newEmail) &&
-                    !isEmailExist(newEmail, emailList)) {
-                  setState(() {
-                    emailList.insert(1, newEmail);
-                  });
-                  Fluttertoast.showToast(
-                    msg: "Email added to the list!",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                    fontSize: 16.0,
-                  );
-                  memberController.clear();
-                  Navigator.of(context).pop();
-                }
-                else{
-                  if(!isValidEmail(newEmail)){
-                    Fluttertoast.showToast(
-                      msg: "Invalid Email!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
-                  }
-                  else{
-                    Fluttertoast.showToast(
-                      msg: "Email already exist in the list!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
-                  }
-                }
-
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
-
-  bool isValidEmail(String email) {
-    RegExp emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegExp.hasMatch(email);
-  }
-
-  bool isEmailExist(String email, List<String> list) {
-    return list.contains(email);
-  }
-
-  addNewTeam(String teamName,emails){
-    if (teamName.isNotEmpty) {
-      FirestoreMethods firestoreMethods = FirestoreMethods();
-      firestoreMethods.addTeam(context,teamName,user.email!).then((teamId) async {
-        for (var email in emails) {
-           firestoreMethods.addMemberToTeam(teamId, email);
-        }
-        //emailList.clear();
-        setState(() {
-          teamController.clear();
-          emailList=[user.email!];
-        });
-        Fluttertoast.showToast(
-          msg: "Team added successefull!",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-        //
-        Navigator.of(context).pop();
-        await getTeams();
+            //refrech list users
+            getUsers(teamID);
+          }).catchError((onError) {
+            customSnackBar(context, LocaleKeys.failedToAddUser.tr(), Colors.red);
       });
     }
-    else{
+  }
 
-      Fluttertoast.showToast(
-        msg: "Team's name can't be empty!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+  getUsers(String teamId) async {
+    usersStatus = [];
+    usersOutOfTeam = [];
+    List<String> allUsersIds = [];
 
+    var userDocs = await FirebaseFirestore.instance.collection("users").get();
+    for (var doc in userDocs.docs) {
+      // do something with the doc here
+      allUsersIds.add(doc.id);
     }
 
+    await FirebaseFirestore.instance
+        .collection("teams")
+        .doc(teamId)
+        .get()
+        .then((value) async {
 
-  }
-  deleteTeam(teamId,teamName){
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+      // get users Ids
+      List<String> teamUsersIds = List.from(value.data()!["members"]);
 
-          title: Text("Are you sure to delete '$teamName' ?"),
-
-          actions: [
-            TextButton(
-              child: Text(LocaleKeys.cancel.tr()),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-
-            TextButton(
-              child: Text(LocaleKeys.yes.tr()),
-              onPressed: ()  {
-                FirestoreMethods firestoreMethods = FirestoreMethods();
-                firestoreMethods.deleteTeam(context,teamId);
-                //getTeams();
-                //si le team supprimé est le team selectionné , on selectionne General Team
-                if(selectedTeamId == teamId){
-                  setState( () {
-                    selectedTeamId = "toBCHluEdzfmeoXhCxQw";
-                    getStorage.write("selectedTeamId", selectedTeamId);
-                    dropdownValue = "General Team";
-                    getStorage.write("selectedTeamName", dropdownValue);
-                  });
-                }
-
-
-
-                Navigator.of(context).pop(); // Fermer la boîte de dialogue
-                setState(() {});
-                Navigator.pop(context);// Mettre à jour l'état pour fermer la liste déroulante
-              },
-            ),
-
-          ],
-        );
-      },
-    );
+      // loop through all ids and get associated user object by userID/followerID
+      for (int i = 0; i < allUsersIds.length; i++) {
+        var userId = allUsersIds[i];
+        if (!teamUsersIds.contains(userId)) {
+          var data = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .get();
+          usersOutOfTeam.add(data);
+          usersStatus.add(false);
+        }
+      }
+      setState(() {});
+    });
   }
 }

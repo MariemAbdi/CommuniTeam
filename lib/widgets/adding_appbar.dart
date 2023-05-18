@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
+import 'package:communiteam/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +87,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
-              "Add a teammate",
+              LocaleKeys.addTeamMember.tr(),
               style: GoogleFonts.robotoCondensed(),
             ),
             content: StatefulBuilder(
@@ -136,7 +139,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
             actions: [
               TextButton(
                 child: Text(
-                  "Add",
+                  LocaleKeys.add.tr(),
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
@@ -147,7 +150,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
               ),
               TextButton(
                 child: Text(
-                  "Cancel",
+                  LocaleKeys.cancel.tr(),
                   style: GoogleFonts.robotoCondensed(color: Colors.red),
                 ),
                 onPressed: () {
@@ -167,16 +170,8 @@ class _AddingAppbarState extends State<AddingAppbar> {
         selectedUserIds.add(usersOutOfTeam[i]["email"]);
       }
     }
-    if (selectedUserIds.length == 0) {
-      Fluttertoast.showToast(
-        msg: "Any User Selected!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+    if (selectedUserIds.isEmpty) {
+      customSnackBar(context, LocaleKeys.noUserSelected.tr(), Colors.red);
     } else {
       // Add selected users to team
       FirebaseFirestore.instance
@@ -187,27 +182,11 @@ class _AddingAppbarState extends State<AddingAppbar> {
             // Clear selectedUserIds and usersStatus
             selectedUserIds.clear();
 
-            Fluttertoast.showToast(
-              msg: "User added successfully",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
+            customSnackBar(context, LocaleKeys.memberAddedSuccessfully, Colors.green);
             //refrech list users
             getUsers("toBCHluEdzfmeoXhCxQw");
           }).catchError((onError) {
-        Fluttertoast.showToast(
-          msg: "Failed to Add Users, Try Again!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
+            customSnackBar(context, LocaleKeys.failedToAddUser, Colors.red);
       });
     }
   }
@@ -219,9 +198,10 @@ class _AddingAppbarState extends State<AddingAppbar> {
       title: Text(widget.title),
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {  },
-          //onPressed: addingTeammate,
+          icon: const Icon(Icons.people),
+          onPressed: () {
+            addingTeammate();
+          },
         ),
       ],
     );

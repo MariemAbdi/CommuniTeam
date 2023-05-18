@@ -1,5 +1,6 @@
 import 'package:communiteam/screens/direct_chat.dart';
 import 'package:communiteam/screens/homepage.dart';
+import 'package:communiteam/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -60,7 +61,13 @@ class _DrawerItemDirectState extends State<DrawerItemDirect> {
         ),
       ),
       title: Text(widget.name, style: GoogleFonts.robotoCondensed(textStyle: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold, overflow: TextOverflow.ellipsis)),),
-
+      trailing: IconButton(
+        padding: EdgeInsets.zero,
+        icon: const Icon(Icons.account_circle,color: Colors.white, size: 16,),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ProfileScreen(isMe: false, userId: widget.receiverId)));
+        },),
       onTap: (){
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => HomePage(isCanal: false, title: widget.name, widget: DirectChatScreen(receiverId: widget.receiverId))));

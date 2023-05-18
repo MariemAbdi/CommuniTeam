@@ -10,7 +10,7 @@ class CodegenLoader extends AssetLoader{
   const CodegenLoader();
 
   @override
-  Future<Map<String, dynamic>> load(String fullPath, Locale locale ) {
+  Future<Map<String, dynamic>?> load(String path, Locale locale) {
     return Future.value(mapLocales[locale.toString()]);
   }
 
@@ -39,7 +39,35 @@ class CodegenLoader extends AssetLoader{
   "canalName": "إسم القناة",
   "add": "إضافة",
   "cancel": "إلغاء",
-  "yes": "نعم"
+  "yes": "نعم",
+  "profile": "حساب شخصي",
+  "welcomeBack": "مرحبًا بعودتك!",
+  "signIn": "تسجيل الدخول",
+  "notAMemberYet": " لست عضوا حتى الآن؟",
+  "signUpNow": "أفتح حساب الأن",
+  "canalCreatedSuccessfully": "تم إنشاء القناة بنجاح!",
+  "canalExistsAlready": "!القناة بهذا الاسم موجودة بالفعل",
+  "canalSuccessfullyDeleted": "تم حذف القناة بنجاح!",
+  "canalRenamedSuccessfully": "تمت إعادة تسمية القناة بنجاح!",
+  "emailSentSuccessfully": "تم ارسال البريد الالكتروني بنجاح",
+  "checkCredentials": "خطأ: يرجى التحقق من بيانات الاعتماد الخاصة بك",
+  "userNotFound": "خطأ: المستخدم غير موجود",
+  "saySomthing": "قل شيئا...",
+  "teamAddedSuccessully": "تمت إضافة الفريق بنجاح!",
+  "areYouSureYouWantToLogout": "هل أنت متأكد أنك تريد تسجيل الخروج ؟",
+  "addNewTeam": "اضافة فريق جديد",
+  "teamName": "اسم الفريق",
+  "teamNameCantBeEmpty": "لا يمكن أن يكون اسم الفريق فارغًا",
+  "areYouSureYouWantToDeleteTeam": "هل أنت متأكد أنك تريد حذف هذا الفريق؟",
+  "teamDeletedSuccessfully": "!تم حذف الفريق بنجاح",
+  "addTeamMember": "إضافة عضو فريق جديد",
+  "memberAddedSuccessfully": "تمت إضافة العضو بنجاح!",
+  "noUserSelected": "لم يتم تحديد أي مستخدم!",
+  "failedToAddUser": "فشل في إضافة مستخدم (مستخدمين) ، حاول مرة أخرى!",
+  "renameCanal": "إعادة تسمية القناة",
+  "rename": "إعادة تسمية",
+  "areYouSureYouWantToDeleteCanal": "هل أنت متأكد أنك تريد حذف هذه القناة؟",
+  "delete": "يمسح"
 };
 static const Map<String,dynamic> en = {
   "emailfieldcantbeempty": "Email Field Can't Be Empty",
@@ -66,7 +94,35 @@ static const Map<String,dynamic> en = {
   "canalName": "Canal Name",
   "add": "Add",
   "cancel": "Cancel",
-  "yes": "Yes"
+  "yes": "Yes",
+  "profile": "Profile",
+  "welcomeBack": "WELCOME BACK!",
+  "signIn": "SIGN IN",
+  "notAMemberYet": "Not A Member Yet? ",
+  "signUpNow": "Sign Up Now",
+  "canalCreatedSuccessfully": "Canal Created Successfully!",
+  "canalExistsAlready": "Canal With This Name Exists Already!",
+  "canalSuccessfullyDeleted": "Canal Successfully Deleted !",
+  "canalRenamedSuccessfully": "Canal Was Renamed Successfully!",
+  "emailSentSuccessfully": "The Email Was Successfully Sent ",
+  "checkCredentials": "Error: Please Check Your Credentials",
+  "userNotFound": "Error: User Not Found",
+  "saySomthing": "Say Something...",
+  "teamAddedSuccessully": "Team Added Successfully!",
+  "areYouSureYouWantToLogout": "Are You Sure You Want To Logout ?",
+  "addNewTeam": "Add A New Team",
+  "teamName": "Team Name",
+  "teamNameCantBeEmpty": "Team's Name Can't Be Empty",
+  "areYouSureYouWantToDeleteTeam": "Are You Sure You Want To Delete This Team?",
+  "teamDeletedSuccessfully": "Team Deleted Successfully!",
+  "addTeamMember": "Add New Team Member",
+  "memberAddedSuccessfully": "Member Added Successfully!",
+  "noUserSelected": "No User Is Selected!",
+  "failedToAddUser": "Failed To Add User(s), Try Again!",
+  "renameCanal": "Rename Canal",
+  "rename": "Rename",
+  "areYouSureYouWantToDeleteCanal": "Are You Sure You Want To Delete This Canal?",
+  "delete": "Delete"
 };
 static const Map<String,dynamic> fr = {
   "emailfieldcantbeempty": "E-mail Ne Peut Pas Être Vide",
@@ -93,7 +149,35 @@ static const Map<String,dynamic> fr = {
   "canalName": "Nom Du Canal",
   "add": "Ajouter",
   "cancel": "Annuler",
-  "yes": "Oui"
+  "yes": "Oui",
+  "profile": "Profil",
+  "welcomeBack": "CONTENT DE VOUS REVOIR!",
+  "signIn": "SE CONNECTER",
+  "notAMemberYet": "Pas Encore Membre? ",
+  "signUpNow": "S'inscrire",
+  "canalCreatedSuccessfully": "Canal Créé Avec Succès !",
+  "canalExistsAlready": "Canal Avec Ce Nom Existe Déjà !",
+  "canalSuccessfullyDeleted": "Canal Supprimé Avec Succès !",
+  "canalRenamedSuccessfully": "Canal A Été Renommé Avec Succès !",
+  "emailSentSuccessfully": "L'e-mail A Été Envoyé Avec Succès",
+  "checkCredentials": "Erreur : Veuillez Vérifier Vos Informations D'identification",
+  "userNotFound": "Erreur : Utilisateur Introuvable",
+  "saySomthing": "Dire Quelque Chose...",
+  "teamAddedSuccessully": "Équipe Ajoutée Avec Succès !",
+  "areYouSureYouWantToLogout": "Êtes-vous Sûr De Vouloir Vous Déconnecter ?",
+  "addNewTeam": "Ajouter Une Nouvelle Équipe",
+  "teamName": "Nom De L'équipe",
+  "teamNameCantBeEmpty": "Le Nom De L'équipe Ne Peut Pas Être Vide",
+  "areYouSureYouWantToDeleteTeam": "Êtes-Vous Sûr De Vouloir Supprimer Cette Équipe ?",
+  "teamDeletedSuccessfully": "Équipe Supprimée Avec Succès !",
+  "addTeamMember": "Ajouter Un Nouveau Membre D'équipe",
+  "memberAddedSuccessfully": "Membre Ajouté Avec Succès !",
+  "noUserSelected": "Aucun Utilisateur N'est Sélectionné !",
+  "failedToAddUser": "Échec De L'ajout D'utilisateur(s), Réessayez !",
+  "renameCanal": "Renommer Canal",
+  "rename": "Renommer",
+  "areYouSureYouWantToDeleteCanal": "Êtes-Vous Sûr De Vouloir Supprimer Ce Canal ?",
+  "delete": "Supprimer"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en, "fr": fr};
 }

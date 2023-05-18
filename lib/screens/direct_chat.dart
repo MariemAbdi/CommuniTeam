@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../services/Theme/custom_theme.dart';
 import '../widgets/message_textfield.dart';
 import '../widgets/single_message.dart';
 
@@ -67,9 +67,9 @@ class _DirectChatScreenState extends State<DirectChatScreen> {
                             reverse: true,
                             physics: const BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
-                              bool isMe = snapshot.data.docs[index]['senderId'] ==
-                                  user.email;
+                              bool isMe = snapshot.data.docs[index]['senderId'] == user.email;
                               return SingleMessage(
+                                  dateTime: DateFormat('dd/MM/yyyy HH:mm').format((snapshot.data.docs[index]['date']).toDate()),
                                   message: snapshot.data.docs[index]['message'],
                                   isMe: isMe);
                             });

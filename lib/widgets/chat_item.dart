@@ -9,7 +9,8 @@ class ChatItem extends StatefulWidget {
   final String message;
   final String userId;
   final bool isMe;
-  const ChatItem({Key? key,required this.isMe,required this.userId, required this.message}) : super(key: key);
+  final String dateTime;
+  const ChatItem({Key? key,required this.isMe,required this.userId, required this.message, required this.dateTime}) : super(key: key);
 
   @override
   State<ChatItem> createState() => _ChatItemState();
@@ -39,7 +40,7 @@ class _ChatItemState extends State<ChatItem> {
     return Container(
       constraints: const BoxConstraints(maxWidth: 200),
       child: ListTile(
-        contentPadding: EdgeInsets.zero,
+       // contentPadding: EdgeInsets.zero,
         visualDensity: const VisualDensity(vertical: 3),
         leading: SizedBox(
           height: MediaQuery.of(context).size.width*0.1,
@@ -76,7 +77,23 @@ class _ChatItemState extends State<ChatItem> {
             },
           ),
         ),
-        title: Text(nickname, style: GoogleFonts.robotoCondensed(fontWeight: widget.isMe ? FontWeight.w800 : FontWeight.w600 , color: widget.isMe ? CustomTheme.darkPurple : CustomTheme.blue),),
+        title: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: FirebaseFirestore.instance.collection("users").doc(widget.userId).get(),
+          builder: (context, snapshot){
+            if(snapshot.hasData){
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(snapshot.data!["nickname"], style: GoogleFonts.robotoCondensed(fontWeight: widget.isMe ? FontWeight.w800 : FontWeight.w600 , color: widget.isMe ? CustomTheme.darkPurple : CustomTheme.blue),),
+
+                  Text(widget.dateTime, style: GoogleFonts.robotoCondensed(fontWeight: FontWeight.w400, color: Colors.grey, fontSize: 12),),
+
+            ],
+              );
+            }
+            return const Text("...");
+          },
+        ),
         subtitle: Text(widget.message, style: GoogleFonts.robotoCondensed(),),
       ),
     );

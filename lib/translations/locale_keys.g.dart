@@ -26,5 +26,33 @@ abstract class  LocaleKeys {
   static const add = 'add';
   static const cancel = 'cancel';
   static const yes = 'yes';
+  static const profile = 'profile';
+  static const welcomeBack = 'welcomeBack';
+  static const signIn = 'signIn';
+  static const notAMemberYet = 'notAMemberYet';
+  static const signUpNow = 'signUpNow';
+  static const canalCreatedSuccessfully = 'canalCreatedSuccessfully';
+  static const canalExistsAlready = 'canalExistsAlready';
+  static const canalSuccessfullyDeleted = 'canalSuccessfullyDeleted';
+  static const canalRenamedSuccessfully = 'canalRenamedSuccessfully';
+  static const emailSentSuccessfully = 'emailSentSuccessfully';
+  static const checkCredentials = 'checkCredentials';
+  static const userNotFound = 'userNotFound';
+  static const saySomthing = 'saySomthing';
+  static const teamAddedSuccessully = 'teamAddedSuccessully';
+  static const areYouSureYouWantToLogout = 'areYouSureYouWantToLogout';
+  static const addNewTeam = 'addNewTeam';
+  static const teamName = 'teamName';
+  static const teamNameCantBeEmpty = 'teamNameCantBeEmpty';
+  static const areYouSureYouWantToDeleteTeam = 'areYouSureYouWantToDeleteTeam';
+  static const teamDeletedSuccessfully = 'teamDeletedSuccessfully';
+  static const addTeamMember = 'addTeamMember';
+  static const memberAddedSuccessfully = 'memberAddedSuccessfully';
+  static const noUserSelected = 'noUserSelected';
+  static const failedToAddUser = 'failedToAddUser';
+  static const renameCanal = 'renameCanal';
+  static const rename = 'rename';
+  static const areYouSureYouWantToDeleteCanal = 'areYouSureYouWantToDeleteCanal';
+  static const delete = 'delete';
 
 }

@@ -27,7 +27,7 @@ Future<void> main() async{
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp,DeviceOrientation.portraitDown]);
 
   //MAKE THE APP FULL SCREEN => HIDES THE STATUS AND NAVIGATION BAR OF THE PHONE
- // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: []);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: []);
 
   //INITIALIZE THE GET STORAGE USED TO SAVE PREFERENCES
   await GetStorage.init();
@@ -83,33 +83,9 @@ class _MyAppState extends State<MyApp> {
         LoginScreen.routeName: (context) => const LoginScreen(),
         SignupScreen.routeName: (context) => const SignupScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),
-        ProfileScreen.routeName: (context) => const ProfileScreen(),
+        ProfileScreen.routeName: (context) => ProfileScreen(isMe: true, userId: context.read<FirebaseAuthMethods>().user.email,),
       },
     )
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: AnimatedSplashScreen(
-          backgroundColor: CustomTheme.darkPurple,
-          splashIconSize: MediaQuery.of(context).size.width*0.5,
-          splash: "assets/images/logo_circle.png",
-          nextScreen: const Auth(),
-          duration: 3000,
-          splashTransition: SplashTransition.scaleTransition,
-        ),
-      ),
     );
   }
 }

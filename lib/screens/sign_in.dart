@@ -1,11 +1,11 @@
-// ignore_for_file: prefer_const_constructors, duplicate_ignore
-
 import 'package:communiteam/screens/sign_up.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
 
 import 'package:communiteam/widgets/custom_button.dart';
 import 'package:communiteam/widgets/email_field.dart';
 import 'package:communiteam/widgets/password_field.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               //Title
                               FittedBox(
-                                child: Text('WELCOME BACK!', style: GoogleFonts.robotoCondensed(fontSize: 40, fontWeight: FontWeight.w800, color: purple),
+                                child: Text(LocaleKeys.welcomeBack.tr(), style: GoogleFonts.robotoCondensed(fontSize: 40, fontWeight: FontWeight.w800, color: purple),
                                 ),
                               ),
                               SizedBox(height: 20),
@@ -105,21 +105,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               SizedBox(height: 20),
 
                               //SIGN IN BUTTON
-                              CustomButton(text: "SIGN IN", function: (){
+                              CustomButton(text: LocaleKeys.signIn.tr(), function: (){
                                 if (_formKey.currentState?.validate() ?? false) {
                                   signIn();
                                 }
                               }),
 
                               //SOME SPACE
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
 
                               FittedBox(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Not A Member Yet? ',
+                                      LocaleKeys.notAMemberYet.tr(),
                                       style: GoogleFonts.robotoCondensed(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     InkWell(
                                       onTap: goToSignupScreen,
                                       child: Text(
-                                        'Sign Up Now',
+                                        LocaleKeys.signUpNow.tr(),
                                         style: GoogleFonts.robotoCondensed(
                                             fontSize: 16,
                                             color: CustomTheme.green,

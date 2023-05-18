@@ -5,10 +5,12 @@ import '../services/Theme/custom_theme.dart';
 
 class SingleMessage extends StatelessWidget {
   final String message;
+  final String dateTime;
   final bool isMe;
 
   const SingleMessage({super.key,
     required this.message,
+    required this.dateTime,
     required this.isMe
   });
   @override
@@ -18,14 +20,22 @@ class SingleMessage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.all(20),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
             width: double.infinity,
             constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
               color: isMe ? CustomTheme.darkPurple : CustomTheme.purplelight,
               borderRadius: const BorderRadius.all(Radius.circular(12))
           ),
-          child: Text(message,style: const TextStyle(color: Colors.white,),)
+          child:
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(message,style: const TextStyle(color: Colors.white, fontSize: 16),),
+              Text(dateTime,style: const TextStyle(color: Colors.grey, fontSize: 12),)
+          ],
+          )
         ),
       ],
       

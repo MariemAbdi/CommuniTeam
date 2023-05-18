@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/widgets/adding_appbar.dart';
 import 'package:communiteam/widgets/drawer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../resources/firestore_methods.dart';
@@ -20,9 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   FirestoreMethods firestoreMethods= FirestoreMethods();
-
   @override
   Widget build(BuildContext context) {
     PreferredSizeWidget addingAppBar = AddingAppbar(title: widget.title, itemId: '',);

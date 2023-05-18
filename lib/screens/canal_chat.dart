@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../resources/firestore_methods.dart';
-import '../services/Theme/custom_theme.dart';
 import '../translations/locale_keys.g.dart';
 import '../widgets/canalMessage_textfield.dart';
 
@@ -96,20 +95,6 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
     return Scaffold(
       body: Column(
         children: [
-           Row(
-              children: [
-                const Spacer(),
-                Expanded(child: Container()), // Empty Expanded to fill available space
-                IconButton(
-                  onPressed: () {
-                    // action à effectuer lorsque l'IconButton est pressé
-                    displayMembers(widget.teamId,widget.canalType,widget.canalId);
-                  },
-                  icon: Icon(Icons.people),
-                ),
-              ],
-            ),
-
           Expanded(
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
@@ -132,17 +117,11 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
                         reverse: true,
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
-                          bool isMe = snapshot.data.docs[index]['senderId'] == user.email;
                           String senderId = snapshot.data.docs[index]['senderId'];
+                          bool isMe = senderId == user.email;
                           String message= snapshot.data.docs[index]['message'];
-
-                          return ChatItem(isMe: isMe, userId: senderId, message: message,);
-
-                          // return SingleCanalMessage(
-                          //     message: snapshot.data.docs[index]['message'],
-                          //     isMe: isMe,
-                          //     senderId: senderId,
-                          // );
+                          String dateTime= DateFormat('dd/MM/yyyy HH:mm').format((snapshot.data.docs[index]['dateTime']).toDate());
+                          return ChatItem(isMe: isMe, userId: senderId, message: message, dateTime: dateTime);
                         }
                     );
                   }
