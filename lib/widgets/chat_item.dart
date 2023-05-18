@@ -40,7 +40,6 @@ class _ChatItemState extends State<ChatItem> {
     return Container(
       constraints: const BoxConstraints(maxWidth: 200),
       child: ListTile(
-       // contentPadding: EdgeInsets.zero,
         visualDensity: const VisualDensity(vertical: 3),
         leading: SizedBox(
           height: MediaQuery.of(context).size.width*0.1,

@@ -51,5 +51,15 @@
   "renameCanal": "Renommer Canal",
   "rename": "Renommer",
   "areYouSureYouWantToDeleteCanal": "Êtes-Vous Sûr De Vouloir Supprimer Ce Canal ?",
-  "delete": "Supprimer"
+  "delete": "Supprimer",
+  "profilePicture": "Image de Profil",
+  "fieldCantBeEmpty": "Ce Champ Ne Peut Pas Être Vide",
+  "update": "Mettre À Jour",
+  "chooseFromGallery": "Choisissez L'image De La Galerie",
+  "nicknameUpdatedSuccessfully": "Pseudo Mis À Jour Avec Succès !",
+  "updateNickname": "Mettre À Jour Le Surnom",
+  "newNickname": "Nouveau surnom",
+  "updateBio": "Mettre À Jour La Biographie",
+  "newBio": "Nouvelle biographie",
+  "bioUpdatedSuccessfully": "Bio Mise À Jour Avec Succès !"
 }

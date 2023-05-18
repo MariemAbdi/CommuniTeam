@@ -51,5 +51,15 @@
   "renameCanal": "Rename Canal",
   "rename": "Rename",
   "areYouSureYouWantToDeleteCanal": "Are You Sure You Want To Delete This Canal?",
-  "delete": "Delete"
+  "delete": "Delete",
+  "profilePicture": "Profile Picture",
+  "fieldCantBeEmpty": "This Field Can't Be Empty",
+  "update": "Update",
+  "chooseFromGallery": "Choose Image From Gallery",
+  "nicknameUpdatedSuccessfully": "Nickname Updated Successfully!",
+  "updateNickname": "Update Nickname",
+  "newNickname": "New Nickname",
+  "updateBio": "Update Bio",
+  "newBio": "New Bio",
+  "bioUpdatedSuccessfully": "Bio Updated Successfully!"
 }

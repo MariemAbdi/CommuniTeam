@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,7 @@ class MessageTextFieldState extends State<MessageTextField> {
              child: TextFormField(
                controller: _controller,
                 decoration: InputDecoration(
-                  labelText:"Type Your Message",
+                  labelText: LocaleKeys.saySomthing.tr(),
                   fillColor: Colors.grey[100],
                   filled: true,
                   border: OutlineInputBorder(

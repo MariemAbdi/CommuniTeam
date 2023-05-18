@@ -54,5 +54,15 @@ abstract class  LocaleKeys {
   static const rename = 'rename';
   static const areYouSureYouWantToDeleteCanal = 'areYouSureYouWantToDeleteCanal';
   static const delete = 'delete';
+  static const profilePicture = 'profilePicture';
+  static const fieldCantBeEmpty = 'fieldCantBeEmpty';
+  static const update = 'update';
+  static const chooseFromGallery = 'chooseFromGallery';
+  static const nicknameUpdatedSuccessfully = 'nicknameUpdatedSuccessfully';
+  static const updateNickname = 'updateNickname';
+  static const newNickname = 'newNickname';
+  static const updateBio = 'updateBio';
+  static const newBio = 'newBio';
+  static const bioUpdatedSuccessfully = 'bioUpdatedSuccessfully';
 
 }

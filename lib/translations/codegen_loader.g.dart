@@ -67,7 +67,17 @@ class CodegenLoader extends AssetLoader{
   "renameCanal": "إعادة تسمية القناة",
   "rename": "إعادة تسمية",
   "areYouSureYouWantToDeleteCanal": "هل أنت متأكد أنك تريد حذف هذه القناة؟",
-  "delete": "يمسح"
+  "delete": "يمسح",
+  "profilePicture": "الصوره الشخصية",
+  "fieldCantBeEmpty": "لا يمكن أن يكون هذا الحقل فارغًا",
+  "update": "تحديث",
+  "chooseFromGallery": "اختر صورة من المعرض",
+  "nicknameUpdatedSuccessfully": "تم تحديث اللقب بنجاح!",
+  "updateNickname": "تحديث اللقب",
+  "newNickname": "لقب جديد",
+  "updateBio": "تحديث السيرة الذاتية",
+  "newBio": "سيرة ذاتية جديدة",
+  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!"
 };
 static const Map<String,dynamic> en = {
   "emailfieldcantbeempty": "Email Field Can't Be Empty",
@@ -122,7 +132,17 @@ static const Map<String,dynamic> en = {
   "renameCanal": "Rename Canal",
   "rename": "Rename",
   "areYouSureYouWantToDeleteCanal": "Are You Sure You Want To Delete This Canal?",
-  "delete": "Delete"
+  "delete": "Delete",
+  "profilePicture": "Profile Picture",
+  "fieldCantBeEmpty": "This Field Can't Be Empty",
+  "update": "Update",
+  "chooseFromGallery": "Choose Image From Gallery",
+  "nicknameUpdatedSuccessfully": "Nickname Updated Successfully!",
+  "updateNickname": "Update Nickname",
+  "newNickname": "New Nickname",
+  "updateBio": "Update Bio",
+  "newBio": "New Bio",
+  "bioUpdatedSuccessfully": "Bio Updated Successfully!"
 };
 static const Map<String,dynamic> fr = {
   "emailfieldcantbeempty": "E-mail Ne Peut Pas Être Vide",
@@ -177,7 +197,17 @@ static const Map<String,dynamic> fr = {
   "renameCanal": "Renommer Canal",
   "rename": "Renommer",
   "areYouSureYouWantToDeleteCanal": "Êtes-Vous Sûr De Vouloir Supprimer Ce Canal ?",
-  "delete": "Supprimer"
+  "delete": "Supprimer",
+  "profilePicture": "Image de Profil",
+  "fieldCantBeEmpty": "Ce Champ Ne Peut Pas Être Vide",
+  "update": "Mettre À Jour",
+  "chooseFromGallery": "Choisissez L'image De La Galerie",
+  "nicknameUpdatedSuccessfully": "Pseudo Mis À Jour Avec Succès !",
+  "updateNickname": "Mettre À Jour Le Surnom",
+  "newNickname": "Nouveau surnom",
+  "updateBio": "Mettre À Jour La Biographie",
+  "newBio": "Nouvelle biographie",
+  "bioUpdatedSuccessfully": "Bio Mise À Jour Avec Succès !"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en, "fr": fr};
 }

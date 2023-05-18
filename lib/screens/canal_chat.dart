@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:communiteam/utils.dart';
 import 'package:communiteam/widgets/chat_item.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +11,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../resources/firestore_methods.dart';
 import '../translations/locale_keys.g.dart';
 import '../widgets/canalMessage_textfield.dart';
-
-import 'package:fluttertoast/fluttertoast.dart';
 
 
 class CanalChatScreen extends StatefulWidget {
@@ -197,40 +196,19 @@ class _CanalChatScreenState extends State<CanalChatScreen> {
 
                   if (userInTeam) {
                     await firestoreMethods.addMemberToCanal(widget.teamId, widget.canalId, userId);
-                    Fluttertoast.showToast(
-                      msg: "User added successfully",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.green,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
-                    //actualiser state
+                    //REFRESH STATE
                     getCanalUsers(widget.teamId, widget.canalType,widget.canalId);
-                    Navigator.of(context).pop();
+                    //POP LOADING CIRCLE
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+                      // then execute the navigation code.
+                      customSnackBar(context, LocaleKeys.memberAddedSuccessfully.tr(), Colors.green);
+                      Navigator.of(context).pop();
+                    });
                   } else {
-                    Fluttertoast.showToast(
-                      msg: "Member not exist in team!",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
+                    if(!mounted) return;
+                    customSnackBar(context, LocaleKeys.userNotFound.tr(), Colors.red);
                   }
-                }
-                else{
-                  Fluttertoast.showToast(
-                    msg: "Email not valid",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.red,
-                    textColor: Colors.white,
-                    fontSize: 16.0,
-                  );
                 }
               },
             ),

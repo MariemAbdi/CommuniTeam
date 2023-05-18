@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
+import 'package:communiteam/translations/locale_keys.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +66,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
   void uploadImage(String fileName) async{
     showCupertinoModalPopup(context: context, builder: (BuildContext context){
       return CupertinoActionSheet(
-        title: Text("Profile Picture", style: GoogleFonts.robotoCondensed(fontWeight: FontWeight.w800),),
+        title: Text(LocaleKeys.profilePicture.tr(), style: GoogleFonts.robotoCondensed(fontWeight: FontWeight.w800),),
         actions: [
           //CHOOSE IMAGE FROM GALLERY
           CupertinoActionSheetAction(
@@ -86,7 +88,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
               }
 
             },
-            child: Text("Choose Image From Gallery", style: GoogleFonts.roboto(),),
+            child: Text(LocaleKeys.chooseFromGallery.tr(), style: GoogleFonts.roboto(),),
           ),
 
           // REMOVE CURRENT PHOTO : DEFAULT
@@ -103,7 +105,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
               });
 
             },
-            child: Text("Remove", style: GoogleFonts.roboto(color: Colors.red),),
+            child: Text(LocaleKeys.delete.tr(), style: GoogleFonts.roboto(color: Colors.red),),
           ),
         ],
       );
@@ -144,9 +146,9 @@ class _ProfilePictureState extends State<ProfilePicture> {
           Navigator.of(context).pop(alertController.text);
           //alertController.clear();
         }else{
-          customSnackBar(context, "This Field Can't Be Empty", Colors.red);
+          customSnackBar(context, LocaleKeys.fieldCantBeEmpty.tr(), Colors.red);
         }
-      }, child: Text("Update",style: GoogleFonts.robotoCondensed(color: Colors.red),
+      }, child: Text(LocaleKeys.update.tr(),style: GoogleFonts.robotoCondensed(color: Colors.red),
       ))
     ],
   ));
@@ -247,7 +249,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           });
 
           //SHOW THE DIALOG ALERT AND GET THE RETURN
-          final newName = await openDialog("Update Nickname", Icons.person, "New Nickname");
+          final newName = await openDialog(LocaleKeys.updateNickname.tr(), Icons.person, LocaleKeys.newNickname.tr());
 
           //CHECK IF WHAT WE'VE GOT IS NULL OR EMPTY
           if(newName==null || newName.isEmpty ){return;}
@@ -265,7 +267,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
             // then execute the navigation code.
-            customSnackBar(context, "Nickname Updated Successfully!", Colors.green);
+            customSnackBar(context, LocaleKeys.nicknameUpdatedSuccessfully.tr(), Colors.green);
           });
 
           //REFRESH DATA ON SCREEN
@@ -281,7 +283,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           });
 
           //SHOW THE DIALOG ALERT AND GET THE RETURN
-          final newBio = await openDialog("Update Bio", Icons.abc, "New Bio");
+          final newBio = await openDialog(LocaleKeys.updateBio.tr(), Icons.abc, LocaleKeys.newBio.tr());
 
           //CHECK IF WHAT WE'VE GOT IS NULL OR EMPTY
           if(newBio==null || newBio.isEmpty ){return;}
@@ -297,7 +299,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
             // then execute the navigation code.
-            customSnackBar(context, "Bio Updated Successfully!", Colors.green);
+            customSnackBar(context, LocaleKeys.bioUpdatedSuccessfully.tr(), Colors.green);
           });
 
           //REFRESH DATA ON SCREEN

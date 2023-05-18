@@ -51,5 +51,15 @@
   "renameCanal": "إعادة تسمية القناة",
   "rename": "إعادة تسمية",
   "areYouSureYouWantToDeleteCanal": "هل أنت متأكد أنك تريد حذف هذه القناة؟",
-  "delete": "يمسح"
+  "delete": "يمسح",
+  "profilePicture": "الصوره الشخصية",
+  "fieldCantBeEmpty": "لا يمكن أن يكون هذا الحقل فارغًا",
+  "update": "تحديث",
+  "chooseFromGallery": "اختر صورة من المعرض",
+  "nicknameUpdatedSuccessfully": "تم تحديث اللقب بنجاح!",
+  "updateNickname": "تحديث اللقب",
+  "newNickname": "لقب جديد",
+  "updateBio": "تحديث السيرة الذاتية",
+  "newBio": "سيرة ذاتية جديدة",
+  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!"
 }
