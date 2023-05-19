@@ -139,8 +139,11 @@ class _DrawerItemCanalState extends State<DrawerItemCanal> {
 
       onTap: (){
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HomePage(isCanal: true,title: widget.canalName ,widget: CanalChatScreen( teamId:widget.teamId, canalType:widget.collectionName , canalId:widget.canalId, nickName: widget.canalName, ))));
-
+            builder: (context) => HomePage(isCanal: true, title: widget.canalName ,teamId: widget.teamId,canalId: widget.canalId,
+                collectionName: widget.collectionName,
+                widget: CanalChatScreen( teamId: widget.teamId, canalType:  widget.collectionName , canalId: widget.canalId, nickName: widget.canalName, )
+            )
+        ));
 
       },
     );

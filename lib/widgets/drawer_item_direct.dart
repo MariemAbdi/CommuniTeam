@@ -70,7 +70,9 @@ class _DrawerItemDirectState extends State<DrawerItemDirect> {
         },),
       onTap: (){
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HomePage(isCanal: false, title: widget.name, widget: DirectChatScreen(receiverId: widget.receiverId))));
+            builder: (context) => HomePage(isCanal: false, title: widget.name, teamId: '', canalId: '', collectionName: '',
+              widget: DirectChatScreen(receiverId: widget.receiverId),
+              )));
       },
 
     );

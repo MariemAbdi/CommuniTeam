@@ -2,17 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/translations/locale_keys.g.dart';
 import 'package:communiteam/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 class AddingAppbar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
-  final String itemId;
+  final String canalId;
+  final String teamId;
+  final String collectionName;
 
 
-  const AddingAppbar({Key? key, required this.title,required this.itemId,}) : super(key: key);
+  const AddingAppbar({Key? key, required this.title,required this.teamId,required this.collectionName,required this.canalId,}) : super(key: key);
 
   @override
   State<AddingAppbar> createState() => _AddingAppbarState();
@@ -22,37 +26,71 @@ class AddingAppbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AddingAppbarState extends State<AddingAppbar> {
+
+  late User currentUser;
+
   List<bool> usersStatus = [];
-  List<dynamic> usersOutOfTeam = [];
+  List<dynamic> usersOfCanal = [];
+  List<dynamic> usersOutOfCanal = [];
+  List<dynamic> usersOfTeam = [];
 
-  getUsers(String teamId) async {
+  getCanalUsers(String teamId,String canalId) async {
     usersStatus = [];
-    usersOutOfTeam = [];
-    List<String> allUsersIds = [];
+    usersOfCanal = [];
+    usersOutOfCanal = [];
+    usersOfTeam = [];
 
-    var userDocs = await FirebaseFirestore.instance.collection("users").get();
-    for (var doc in userDocs.docs) {
-      // do something with the doc here
-      allUsersIds.add(doc.id);
-    }
+    List<String> allUsersIds = [];
 
     await FirebaseFirestore.instance
         .collection("teams")
         .doc(teamId)
         .get()
         .then((value) async {
-      // get users Ids
+       allUsersIds = List.from(value.data()!["members"]);
+
+       for (int i = 0; i < allUsersIds.length; i++) {
+         var userId = allUsersIds[i];
+
+         var data = await FirebaseFirestore.instance
+             .collection("users")
+             .doc(userId)
+             .get();
+         usersOfTeam.add(data);
+       }
+
+      setState(() {});
+    });
+
+
+    await FirebaseFirestore.instance
+        .collection("teams")
+        .doc(teamId)
+        .collection("privateCanals")
+        .doc(canalId)
+        .get()
+        .then((value) async {
+
       List<String> itemUsersIds = List.from(value.data()!["members"]);
 
-      // loop through all ids and get associated user object by userID/followerID
+      for (int i = 0; i < itemUsersIds.length; i++) {
+        var userId = itemUsersIds[i];
+          var data = await FirebaseFirestore.instance
+              .collection("users")
+              .doc(userId)
+              .get();
+          usersOfCanal.add(data);
+      }
+
       for (int i = 0; i < allUsersIds.length; i++) {
         var userId = allUsersIds[i];
+
         if (!itemUsersIds.contains(userId)) {
           var data = await FirebaseFirestore.instance
               .collection("users")
               .doc(userId)
               .get();
-          usersOutOfTeam.add(data);
+          usersOutOfCanal.add(data);
           usersStatus.add(false);
         }
       }
@@ -63,7 +101,8 @@ class _AddingAppbarState extends State<AddingAppbar> {
   @override
   void initState() {
     super.initState();
-    getUsers("toBCHluEdzfmeoXhCxQw");
+    currentUser = FirebaseAuth.instance.currentUser!;
+    getCanalUsers(widget.teamId,widget.canalId);
   }
 
   Future<Widget> buildProfileAvatar(String userId) async {
@@ -86,7 +125,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
-              LocaleKeys.addTeamMember.tr(),
+              "Add member to this Canal",
               style: GoogleFonts.robotoCondensed(),
             ),
             content: StatefulBuilder(
@@ -95,12 +134,12 @@ class _AddingAppbarState extends State<AddingAppbar> {
                   width: double.maxFinite,
                   child: ListView.builder(
                     shrinkWrap: true,
-                    itemCount: usersOutOfTeam.length,
+                    itemCount: usersOutOfCanal.length,
                     itemBuilder: (BuildContext context, int index) {
                       return ListTile(
                         leading: FutureBuilder<Widget>(
                           future: buildProfileAvatar(
-                              usersOutOfTeam[index]["email"]),
+                              usersOutOfCanal[index]["email"]),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return snapshot.data!;
@@ -113,13 +152,13 @@ class _AddingAppbarState extends State<AddingAppbar> {
                           },
                         ),
                         title: Text(
-                          usersOutOfTeam[index]["nickname"],
+                          usersOutOfCanal[index]["nickname"],
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         subtitle: Text(
-                          usersOutOfTeam[index]["email"],
+                          usersOutOfCanal[index]["email"],
                         ),
                         trailing: Checkbox(
                           value: usersStatus[index],
@@ -142,7 +181,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
-                  addSelectedUsersToTeam();
+                  addSelectedUsersToCanal();
 
                   Navigator.of(context).pop();
                 },
@@ -161,12 +200,12 @@ class _AddingAppbarState extends State<AddingAppbar> {
         });
   }
 
-  void addSelectedUsersToTeam() {
+  void addSelectedUsersToCanal() {
     List<String> selectedUserIds = [];
     // Loop through usersStatus and add selected user ids to selectedUserIds
     for (int i = 0; i < usersStatus.length; i++) {
       if (usersStatus[i]) {
-        selectedUserIds.add(usersOutOfTeam[i]["email"]);
+        selectedUserIds.add(usersOutOfCanal[i]["email"]);
       }
     }
     if (selectedUserIds.isEmpty) {
@@ -175,7 +214,9 @@ class _AddingAppbarState extends State<AddingAppbar> {
       // Add selected users to team
       FirebaseFirestore.instance
           .collection("teams")
-          .doc("toBCHluEdzfmeoXhCxQw")
+          .doc(widget.teamId)
+          .collection(widget.collectionName)
+          .doc(widget.canalId)
           .update({"members": FieldValue.arrayUnion(selectedUserIds)}).then(
               (value) {
             // Clear selectedUserIds and usersStatus
@@ -183,11 +224,100 @@ class _AddingAppbarState extends State<AddingAppbar> {
 
             customSnackBar(context, LocaleKeys.memberAddedSuccessfully, Colors.green);
             //refrech list users
-            getUsers("toBCHluEdzfmeoXhCxQw");
+            getCanalUsers(widget.teamId,widget.canalId);
           }).catchError((onError) {
             customSnackBar(context, LocaleKeys.failedToAddUser, Colors.red);
       });
     }
+  }
+
+
+
+
+  void displayMembers(){
+    List<dynamic> users = widget.collectionName=="publicCanals" ?
+        usersOfTeam: usersOfCanal ;
+
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) {
+
+          return AlertDialog(
+            actionsAlignment: MainAxisAlignment.start,
+            title: Text(
+              "Canal's members",
+              style: GoogleFonts.robotoCondensed(),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    leading: FutureBuilder<Widget>(
+                      future: buildProfileAvatar(users[index]["email"]),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return snapshot.data!;
+                        } else {
+                          return const CircleAvatar(
+
+                            backgroundImage: AssetImage("assets/images/avatar3.png"),
+                          );
+                        }
+                      },
+                    ),
+                    title: Text(
+                      users[index]["nickname"],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      users[index]["email"],
+                    ),
+
+                  );
+                },
+              ),
+            ),
+            actions: [
+
+              ( users.length > 0 &&  users[0]["email"] == currentUser.email ) ?
+
+              TextButton(
+                child: Text(
+                  LocaleKeys.add.tr(),
+                  style: GoogleFonts.robotoCondensed(),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                 addingTeammate();
+
+                },
+              ):TextButton(
+                child: Text("Ok",
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+
+              TextButton(
+                child: Text(
+                  LocaleKeys.cancel.tr(),
+                  style: GoogleFonts.robotoCondensed(color: Colors.red),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+
+        });
+
   }
 
   @override
@@ -199,7 +329,8 @@ class _AddingAppbarState extends State<AddingAppbar> {
         IconButton(
           icon: const Icon(Icons.people),
           onPressed: () {
-            addingTeammate();
+            //addingTeammate();
+            displayMembers();
           },
         ),
       ],

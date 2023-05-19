@@ -687,7 +687,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   //GOING TO THE DEFAULT TEAM'S SCREEN
                   Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => const HomePage(isCanal: true, title: "General Team" ,widget: CanalChatScreen( teamId: "toBCHluEdzfmeoXhCxQw", canalType: "publicCanals" , canalId: "lTfMN0DfWD4SvUvmfgHZ", nickName: "General", ))
+                          builder: (context) => const HomePage(isCanal: true, title: "General Team" ,teamId: 'toBCHluEdzfmeoXhCxQw',canalId: 'lTfMN0DfWD4SvUvmfgHZ',
+                              collectionName: 'publicCanals',
+                              widget: CanalChatScreen( teamId: "toBCHluEdzfmeoXhCxQw", canalType: "publicCanals" , canalId: "lTfMN0DfWD4SvUvmfgHZ", nickName: "General", )
+                          )
                   ));
                 }
 

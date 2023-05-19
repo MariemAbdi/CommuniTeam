@@ -20,7 +20,9 @@ class Auth extends StatelessWidget {
           //USER IS LOGGED IN
           if(snapshot.hasData){
             //ALWAYS OPENS TO THE DEFAULT TEAM'S GENERAL CANAL
-            return const HomePage(isCanal: true, title: "General Team" ,widget: CanalChatScreen( teamId: "toBCHluEdzfmeoXhCxQw", canalType: "publicCanals" , canalId: "lTfMN0DfWD4SvUvmfgHZ", nickName: "General", ));
+            return const HomePage(isCanal: true, title: "General Team" ,teamId: 'toBCHluEdzfmeoXhCxQw',canalId: 'lTfMN0DfWD4SvUvmfgHZ',
+                collectionName: 'publicCanals',
+                widget: CanalChatScreen( teamId: "toBCHluEdzfmeoXhCxQw", canalType: "publicCanals" , canalId: "lTfMN0DfWD4SvUvmfgHZ", nickName: "General", ));
           }else{
             return const LoginScreen();
           }

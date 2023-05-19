@@ -11,7 +11,13 @@ class HomePage extends StatefulWidget {
   final Widget widget;
   final String title;
   final bool isCanal;
-  const HomePage({Key? key,required this.isCanal, required this.title, required this.widget, }) : super(key: key);
+
+  final String teamId;
+  final String canalId;
+ final String collectionName;
+
+  const HomePage({Key? key,required this.isCanal, required this.title, required this.teamId, required this.canalId,
+    required this.collectionName, required this.widget, }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -21,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   FirestoreMethods firestoreMethods= FirestoreMethods();
   @override
   Widget build(BuildContext context) {
-    PreferredSizeWidget addingAppBar = AddingAppbar(title: widget.title, itemId: '',);
+    PreferredSizeWidget addingAppBar = AddingAppbar(title: widget.title, canalId: widget.canalId, teamId: widget.teamId, collectionName: widget.collectionName,);
     PreferredSizeWidget customAppBar = CustomAppbar(title: widget.title,);
     return WillPopScope(
       onWillPop: () async => false,

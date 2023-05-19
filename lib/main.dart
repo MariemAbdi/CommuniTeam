@@ -79,7 +79,9 @@ class _MyAppState extends State<MyApp> {
       //FIRST SCREEN
       home: const Auth(),
       routes: {
-        HomePage.routeName: (context) => HomePage(isCanal:true,title: "Channel Name",widget: Container()),
+        HomePage.routeName: (context) => HomePage(isCanal:true,title: "Channel Name",
+          widget: Container(), teamId: '', canalId: '', collectionName: '',),
+
         LoginScreen.routeName: (context) => const LoginScreen(),
         SignupScreen.routeName: (context) => const SignupScreen(),
         SettingsScreen.routeName: (context) => const SettingsScreen(),

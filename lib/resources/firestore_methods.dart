@@ -119,7 +119,9 @@ class FirestoreMethods{
 
 
         //GOING TO THE NEW TEAM'S SCREEN
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals" , canalId:value.id, nickName: canalName, ))));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(isCanal: true,title: canalName ,canalId:value.id, teamId: teamID, collectionName: 'publicCanals',
+            widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals", canalId: value.id, nickName: canalName , ) )
+        ));
         customSnackBar(context, LocaleKeys.canalCreatedSuccessfully.tr(), Colors.green);
       });
     }else if(!docPrivateSnapshot.exists && isPrivate) {
@@ -142,7 +144,10 @@ class FirestoreMethods{
        // Navigator.pop(context);
       //  Navigator.of(context).pop();
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HomePage(isCanal: true,title: canalName ,widget: CanalChatScreen( teamId:teamID, canalType:"privateCanals" , canalId:value.id, nickName: canalName, ))));
+            builder: (context) => HomePage(isCanal: true,title: canalName ,teamId: teamID, canalId: value.id, collectionName: 'privateCanals',
+                widget: CanalChatScreen( teamId:teamID, canalType:"privateCanals" , canalId:value.id, nickName: canalName, ),
+              )));
+
 
         customSnackBar(context, LocaleKeys.canalCreatedSuccessfully.tr(), Colors.green);
       });
@@ -155,39 +160,6 @@ class FirestoreMethods{
     }
   }
 
-  // //CREATE NEW CHANNEL
-  // Future<void> addGeneralCanal(BuildContext context, String teamID, String owner) async {
-  //   CollectionReference publicCanal = teams.doc(teamID).collection("publicCanals");
-  //
-  //     await publicCanal.add({
-  //       'name': "General",
-  //       'owner': owner,
-  //     }).then((value) {
-  //       //update the id
-  //       publicCanal.doc(value.id).update({
-  //         "id": value.id
-  //       });
-  //
-  //       //Update the TEAM'S DEFAULT CANAL
-  //       teams.doc(teamID).update({
-  //         "defaultCanal": value.id
-  //       });
-  //     });
-  //
-  // }
-
-  //DELETE CHANNEL
-  /*
-  Future<void> deleteCanal(BuildContext context,String teamID,String collectionName,String canalId) {
-    // Call the  CollectionReference to delete the document
-    return teams.doc(teamID)
-        .collection(collectionName)
-        .doc(canalId)
-        .delete()
-        .then((value) => customSnackBar(context, "Canal Successfully Deleted!", Colors.green))
-        .catchError((error) => debugPrint("ERROR: $error"));
-  }
-*/
 
   //DELETE CHANNEL
   Future<void> deleteCanal(BuildContext context, String teamID,String collectionName, String canalID) async {
@@ -217,18 +189,6 @@ class FirestoreMethods{
     }
   }
 
-
-  //DELETE CHANNEL
-  /*
-  Future<void> deleteTeam(BuildContext context,String teamID) {
-    // Call the  CollectionReference to delete the document
-    return teams.doc(teamID)
-        .delete()
-        .then((value) => customSnackBar(context, "Team Successfully Deleted!", Colors.green))
-        .catchError((error) => debugPrint("ERROR: $error"));
-  }
-
-   */
   //DELETE TEAM
   Future<void> deleteTeam(BuildContext context, String teamID) async {
     try {
