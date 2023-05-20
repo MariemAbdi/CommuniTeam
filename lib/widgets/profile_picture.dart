@@ -115,6 +115,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
   Widget nameBio(String name, double fontSize, FontWeight fontWeight, VoidCallback function){
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(name,style: GoogleFonts.robotoCondensed(textStyle: TextStyle(fontWeight: fontWeight, fontSize: fontSize),)),
         Visibility(
@@ -122,7 +123,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
           child: IconButton(
             padding: EdgeInsets.zero,
             onPressed: function,
-            icon: const Icon(Icons.edit, color: Colors.white, size: 18,),
+            icon: const Icon(Icons.edit, color: CustomTheme.darkPurple, size: 18,),
           ),
         )
       ],
@@ -264,11 +265,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
                 "nickname": newName,
               });
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
-            // then execute the navigation code.
-            customSnackBar(context, LocaleKeys.nicknameUpdatedSuccessfully.tr(), Colors.green);
-          });
+          if(!mounted)return;
+          customSnackBar(context, LocaleKeys.nicknameUpdatedSuccessfully.tr(), Colors.green);
 
           //REFRESH DATA ON SCREEN
           setState(() {_fetchData(context);});
@@ -295,12 +293,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
                 "bio": newBio,
               });
 
-          //POP LOADING CIRCLE
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
-            // then execute the navigation code.
-            customSnackBar(context, LocaleKeys.bioUpdatedSuccessfully.tr(), Colors.green);
-          });
+          if(!mounted)return;
+          customSnackBar(context, LocaleKeys.bioUpdatedSuccessfully.tr(), Colors.green);
 
           //REFRESH DATA ON SCREEN
           setState(() {_fetchData(context);});

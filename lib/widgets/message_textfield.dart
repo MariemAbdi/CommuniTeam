@@ -23,7 +23,7 @@ class MessageTextFieldState extends State<MessageTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-       color: Colors.white,
+        color: Theme.of(context).scaffoldBackgroundColor,
        padding: const EdgeInsetsDirectional.all(8),
        child: Row(
          children: [
@@ -57,31 +57,25 @@ class MessageTextFieldState extends State<MessageTextField> {
            GestureDetector(
              onTap: ()async{
                String message = _controller.text;
-               _controller.clear();
-               await FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).collection('chats').add({
-                  "senderId": user.email!,
-                  "receiverId": widget.receiverId,
-                  "message": message,
-                  "type": "text",
-                  "date": DateTime.now(),
-               }).then((value) {
-                 FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).set({
-                     //'last_msg':message,
+               if(message.isNotEmpty){
+                 _controller.clear();
+                 await FirebaseFirestore.instance.collection('users').doc(user.email!).collection('messages').doc(widget.receiverId).collection('chats').add({
+                   "senderId": user.email!,
+                   "receiverId": widget.receiverId,
+                   "message": message,
+                   "type": "text",
+                   "date": DateTime.now(),
                  });
-               });
 
-               await FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).collection("chats").add({
-                 "senderId": user.email!,
-                 "receiverId": widget.receiverId,
-                 "message" :message,
-                 "type": "text",
-                 "date": DateTime.now(),
+                 await FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).collection("chats").add({
+                   "senderId": user.email!,
+                   "receiverId": widget.receiverId,
+                   "message" :message,
+                   "type": "text",
+                   "date": DateTime.now(),
 
-               }).then((value){
-                 FirebaseFirestore.instance.collection('users').doc(widget.receiverId).collection('messages').doc(user.email!).set({
-                   //"last_msg":message
                  });
-               });
+               }
              },
              child: Container(
                padding: const EdgeInsets.all(8),

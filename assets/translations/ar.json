@@ -61,5 +61,7 @@
   "newNickname": "لقب جديد",
   "updateBio": "تحديث السيرة الذاتية",
   "newBio": "سيرة ذاتية جديدة",
-  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!"
+  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!",
+  "done": "منتهي",
+  "canalMembers": "أعضاء القناة"
 }

@@ -68,24 +68,26 @@ class _CanalMessageTextFieldState extends State<CanalMessageTextField> {
           GestureDetector(
             onTap: ()async{
               String message = _controller.text;
-              _controller.clear();
-              var newDocRef = await FirebaseFirestore.instance
-                  .collection("teams")
-                  .doc(widget.teamId)
-                  .collection(widget.canalType)
-                  .doc(widget.canalId)
-                  .collection('messages')
-                  .add({
-                "senderId": user.email!,
-                "message": message,
-                "dateTime": DateTime.now(),
-              });
+              if(message.isNotEmpty){
+                _controller.clear();
+                var newDocRef = await FirebaseFirestore.instance
+                    .collection("teams")
+                    .doc(widget.teamId)
+                    .collection(widget.canalType)
+                    .doc(widget.canalId)
+                    .collection('messages')
+                    .add({
+                  "senderId": user.email!,
+                  "message": message,
+                  "dateTime": DateTime.now(),
+                });
 
-              String newDocId = newDocRef.id;
+                String newDocId = newDocRef.id;
 
-              await newDocRef.update({
-                "documentId": newDocId,
-              });
+                await newDocRef.update({
+                  "documentId": newDocId,
+                });
+              }
             },
             child: Container(
               padding: const EdgeInsets.all(10),

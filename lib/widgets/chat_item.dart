@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:communiteam/services/Theme/custom_theme.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,7 @@ class _ChatItemState extends State<ChatItem> {
     super.initState();
     _fetchData(context);
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: widget.isCanal?  addingAppBar: customAppBar,
         drawer: const DrawerWidget(),
         body:widget.widget,

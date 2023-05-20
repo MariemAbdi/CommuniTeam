@@ -20,7 +20,7 @@ class SingleMessage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
+          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
             width: double.infinity,
             constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
@@ -33,7 +33,7 @@ class SingleMessage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(message,style: const TextStyle(color: Colors.white, fontSize: 16),),
-              Text(dateTime,style: const TextStyle(color: Colors.grey, fontSize: 12),)
+              Text(dateTime,style: TextStyle(color: isMe ? Colors.grey: Colors.black, fontSize: 12),)
           ],
           )
         ),

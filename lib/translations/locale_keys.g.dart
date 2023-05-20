@@ -64,5 +64,7 @@ abstract class  LocaleKeys {
   static const updateBio = 'updateBio';
   static const newBio = 'newBio';
   static const bioUpdatedSuccessfully = 'bioUpdatedSuccessfully';
+  static const done = 'done';
+  static const canalMembers = 'canalMembers';
 
 }

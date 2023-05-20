@@ -61,5 +61,7 @@
   "newNickname": "New Nickname",
   "updateBio": "Update Bio",
   "newBio": "New Bio",
-  "bioUpdatedSuccessfully": "Bio Updated Successfully!"
+  "bioUpdatedSuccessfully": "Bio Updated Successfully!",
+  "done": "DONE",
+  "canalMembers": "Canal Members"
 }

@@ -109,9 +109,9 @@ class FirestoreMethods{
         });
 
         // Update the TEAM'S DEFAULT CANAL
-        // teams.doc(teamID).update({
-        //   "defaultCanal": value.id
-        // });
+        teams.doc(teamID).update({
+          "defaultCanal": value.id
+        });
 
 
         //Navigator.pop(context);

@@ -125,7 +125,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
-              "Add member to this Canal",
+              LocaleKeys.addTeamMember.tr(),
               style: GoogleFonts.robotoCondensed(),
             ),
             content: StatefulBuilder(
@@ -245,7 +245,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.start,
             title: Text(
-              "Canal's members",
+              LocaleKeys.canalMembers.tr(),
               style: GoogleFonts.robotoCondensed(),
             ),
             content: SizedBox(
@@ -284,7 +284,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
             ),
             actions: [
 
-              ( users.length > 0 &&  users[0]["email"] == currentUser.email ) ?
+              ( users.isNotEmpty &&  users[0]["email"] == currentUser.email ) ?
 
               TextButton(
                 child: Text(
@@ -297,7 +297,7 @@ class _AddingAppbarState extends State<AddingAppbar> {
 
                 },
               ):TextButton(
-                child: Text("Ok",
+                child: Text(LocaleKeys.done.tr(),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -329,7 +329,6 @@ class _AddingAppbarState extends State<AddingAppbar> {
         IconButton(
           icon: const Icon(Icons.people),
           onPressed: () {
-            //addingTeammate();
             displayMembers();
           },
         ),

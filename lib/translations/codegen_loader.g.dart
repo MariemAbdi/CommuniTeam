@@ -77,7 +77,9 @@ class CodegenLoader extends AssetLoader{
   "newNickname": "لقب جديد",
   "updateBio": "تحديث السيرة الذاتية",
   "newBio": "سيرة ذاتية جديدة",
-  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!"
+  "bioUpdatedSuccessfully": "تم تحديث السيرة الذاتية بنجاح!",
+  "done": "منتهي",
+  "canalMembers": "أعضاء القناة"
 };
 static const Map<String,dynamic> en = {
   "emailfieldcantbeempty": "Email Field Can't Be Empty",
@@ -142,7 +144,9 @@ static const Map<String,dynamic> en = {
   "newNickname": "New Nickname",
   "updateBio": "Update Bio",
   "newBio": "New Bio",
-  "bioUpdatedSuccessfully": "Bio Updated Successfully!"
+  "bioUpdatedSuccessfully": "Bio Updated Successfully!",
+  "done": "DONE",
+  "canalMembers": "Canal Members"
 };
 static const Map<String,dynamic> fr = {
   "emailfieldcantbeempty": "E-mail Ne Peut Pas Être Vide",
@@ -207,7 +211,9 @@ static const Map<String,dynamic> fr = {
   "newNickname": "Nouveau surnom",
   "updateBio": "Mettre À Jour La Biographie",
   "newBio": "Nouvelle biographie",
-  "bioUpdatedSuccessfully": "Bio Mise À Jour Avec Succès !"
+  "bioUpdatedSuccessfully": "Bio Mise À Jour Avec Succès !",
+  "done": "FINI",
+  "canalMembers": "Membres Du Canal"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"ar": ar, "en": en, "fr": fr};
 }

@@ -42,6 +42,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   TextEditingController memberController = TextEditingController();
   TextEditingController teamController = TextEditingController();
+  TextEditingController controller = TextEditingController();
   List<String> emailList = [];
   late int randomId=3;
 
@@ -521,8 +522,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   maxLines: 1,
                 ),
               ),
-              if ((value.id != "toBCHluEdzfmeoXhCxQw") &&
-                  (value.members[0] == user.email!))
+              if ((value.id != "toBCHluEdzfmeoXhCxQw") && (value.members[0] == user.email!))
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   mainAxisSize: MainAxisSize.min,
@@ -630,10 +630,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   style: GoogleFonts.robotoCondensed(),
                 ),
                 onPressed: () {
-                  FirestoreMethods firestoreMethods = FirestoreMethods();
-                  firestoreMethods.addTeam(context,teamController.text.trim(),user.email!);
-
-                  customSnackBar(context, LocaleKeys.teamAddedSuccessully.tr(), Colors.green);
+                 if(teamController.text.trim().isNotEmpty){
+                   FirestoreMethods firestoreMethods = FirestoreMethods();
+                   firestoreMethods.addTeam(context,teamController.text.trim(),user.email!);
+                   customSnackBar(context, LocaleKeys.teamAddedSuccessully.tr(), Colors.green);
+                 }else{
+                   Future.delayed(const Duration(seconds: 5), () {
+                     try {
+                       Navigator.pop(context);
+                     } on Exception {}
+                   });
+                   customSnackBar(context, LocaleKeys.teamNameCantBeEmpty.tr(), Colors.red);
+                 }
                 },
               ),
               TextButton(
@@ -650,7 +658,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         });
   }
 
-  //ALERT DIALOG TO DELETE A TEAM
   deleteTeam(teamId,teamName){
     showDialog(
       context: context,

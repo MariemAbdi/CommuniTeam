@@ -43,13 +43,16 @@ class FirebaseAuthMethods{
       firestoreMethods.addMemberToTeam("toBCHluEdzfmeoXhCxQw",email);
 
       //POP LOADING CIRCLE
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
-        // then execute the navigation code.
-        Navigator.pop(context);
-      });
+      Navigator.pop(context);
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
+      //   // then execute the navigation code.
+      //
+      // });
 
     }on FirebaseAuthException catch(e){
+        //POP LOADING CIRCLE
+        Navigator.pop(context);
         customSnackBar(context, e.message!, Colors.red);
     } catch(e){
       debugPrint(e.toString());
@@ -67,17 +70,14 @@ class FirebaseAuthMethods{
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       //POP LOADING CIRCLE
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        //By nesting it in the callback of addPostFrameCallback you are basically saying when the widget is done building,
-        // then execute the navigation code.
-        Navigator.pop(context);
-        popRoute(context);
-      });
-
+      Navigator.pop(context);
+      popRoute(context);
     }on FirebaseAuthException catch(e){
       if (e.code == 'user-not-found') {
         customSnackBar(context, LocaleKeys.userNotFound.tr(), Colors.red);
       }else{
+        //POP LOADING CIRCLE
+        Navigator.pop(context);
         customSnackBar(context, LocaleKeys.checkCredentials.tr(), Colors.red);
       }
     } catch(e){
