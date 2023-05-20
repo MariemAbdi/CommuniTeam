@@ -633,6 +633,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                  if(teamController.text.trim().isNotEmpty){
                    FirestoreMethods firestoreMethods = FirestoreMethods();
                    firestoreMethods.addTeam(context,teamController.text.trim(),user.email!);
+
                    customSnackBar(context, LocaleKeys.teamAddedSuccessully.tr(), Colors.green);
                  }else{
                    Future.delayed(const Duration(seconds: 5), () {

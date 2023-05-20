@@ -3,6 +3,7 @@ import 'package:communiteam/translations/locale_keys.g.dart';
 import 'package:communiteam/utils.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../screens/canal_chat.dart';
 import '../screens/homepage.dart';
@@ -23,6 +24,10 @@ class FirestoreMethods{
       teams.doc(value.id).update({
         "id": value.id
       });
+
+      GetStorage getStorage=GetStorage();
+      getStorage.write("selectedTeamId",value.id);
+      getStorage.write("selectedTeamName", teamName);
       addCanal(context, value.id, "General", false, owner);
       //addGeneralCanal(context,value.id, owner);
       return value.id; // Return the new team ID
@@ -96,8 +101,10 @@ class FirestoreMethods{
     //GET CANAL
     final docPrivateSnapshot = await docPrivateCanal.get();
 
+
     //IF IT DOESN'T EXIST THEN WE ADD IT TO THE FIRESTORE
     if(!docPublicSnapshot.exists && !isPrivate) {
+
       //IF PUBLIC
       await publicCanal.add({
         'name': canalName,
@@ -113,17 +120,13 @@ class FirestoreMethods{
           "defaultCanal": value.id
         });
 
-
-        //Navigator.pop(context);
-        //Navigator.of(context).pop();
-
-
         //GOING TO THE NEW TEAM'S SCREEN
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomePage(isCanal: true,title: canalName ,canalId:value.id, teamId: teamID, collectionName: 'publicCanals',
             widget: CanalChatScreen( teamId:teamID, canalType:"publicCanals", canalId: value.id, nickName: canalName , ) )
         ));
         customSnackBar(context, LocaleKeys.canalCreatedSuccessfully.tr(), Colors.green);
       });
+
     }else if(!docPrivateSnapshot.exists && isPrivate) {
       //IF PRIVATE
       await privateCanal.add({
