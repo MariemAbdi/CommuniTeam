@@ -34,9 +34,7 @@ Flutter Slack Alike Project For Uni
 
 <p float="left" align="center">
 <img src="https://github.com/MariemAbdi/CommuniTeam/assets/100727442/ac07e987-a3a8-44e8-bfc0-5c65f18e04cb" width="300">
-<img src="https://github.com/MariemAbdi/CommuniTeam/assets/100727442/7e9ac687-9fab-43ea-939c-0f1cd0622aa8" width="300">
-</p>
-
-<p float="left" align="center">
 <img src="https://github.com/MariemAbdi/CommuniTeam/assets/100727442/1f2b3bac-08b1-4305-8ce9-e21f484c6dc3" width="300">
 </p>
+
+
